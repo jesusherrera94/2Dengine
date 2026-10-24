@@ -10,6 +10,8 @@ class Game {
     SDL_Renderer* renderer;
 
     public:
+        int windowWidth;
+        int windowHeight;
         Game();
         ~Game();
         void initialize();

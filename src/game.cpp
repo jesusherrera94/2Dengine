@@ -18,13 +18,19 @@ void Game::initialize() {
         cerr << "Error: failed to initialize SDL: " << SDL_GetError() << endl;
         return;
     };
+    // Getting the current display mode to set the window size to the display size
+    // Fake fullscreen
+    SDL_DisplayMode displayMode;
+    SDL_GetCurrentDisplayMode(0, &displayMode);
+    windowWidth = displayMode.w;
+    windowHeight = displayMode.h;
 
     window = SDL_CreateWindow(
         NULL,
         //position: x, y
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         //size: Width, height,
-        800, 600,
+        windowWidth, windowHeight,
         // flags
         SDL_WINDOW_BORDERLESS
     );
@@ -37,6 +43,9 @@ void Game::initialize() {
         cerr << "Error: failed to create renderer: " << SDL_GetError() << endl;
         return;
     }
+
+    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+
     isRunning = true;
 }
 
