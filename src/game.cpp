@@ -38,11 +38,21 @@ void Game::initialize() {
         cerr << "Error: failed to create window: " << SDL_GetError() << endl;
         return;
     }
-    renderer = SDL_CreateRenderer(window, -1, 0);
-    if (!window) {
+
+    renderer = SDL_CreateRenderer(
+        // window object
+        window,
+        // index of the rendering driver to initialize, -1 means first one supporting the requested flags
+        -1,
+        // flags
+        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
+    );
+
+    if (!renderer) {
         cerr << "Error: failed to create renderer: " << SDL_GetError() << endl;
         return;
     }
+
     // real fullscreen
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
