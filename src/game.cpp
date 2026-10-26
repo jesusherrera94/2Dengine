@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "game.h"
+#include "logger.h"
 using namespace std;
 
 
@@ -17,17 +18,18 @@ void Game::setup() {
 
 Game::Game() {
     isRunning = false;
-    cout << "Game constructor called" << endl;
+    Logger::Log("Game constructor called");
+    Logger::Err("Testing errors!!!!!!!");
 }
 
 Game::~Game() {
-    cout << "Game destructor called" << endl;
+    Logger::Log("Game destructor called");
 }
 
 void Game::initialize() {
     // Initialize SDL
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-        cerr << "Error: failed to initialize SDL: " << SDL_GetError() << endl;
+        Logger::Err("Error: failed to initialize SDL: " + std::string(SDL_GetError()));
         return;
     };
     // Getting the current display mode to set the window size to the display size
@@ -47,7 +49,7 @@ void Game::initialize() {
         SDL_WINDOW_BORDERLESS
     );
     if (!window) {
-        cerr << "Error: failed to create window: " << SDL_GetError() << endl;
+        Logger::Err("Error: failed to create window: " + std::string(SDL_GetError()));
         return;
     }
 
@@ -61,7 +63,7 @@ void Game::initialize() {
     );
 
     if (!renderer) {
-        cerr << "Error: failed to create renderer: " << SDL_GetError() << endl;
+        Logger::Err("Error: failed to create renderer: " + std::string(SDL_GetError()));
         return;
     }
 
