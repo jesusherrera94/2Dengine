@@ -19,7 +19,6 @@ void Game::setup() {
 Game::Game() {
     isRunning = false;
     Logger::Log("Game constructor called");
-    Logger::Err("Testing errors!!!!!!!");
 }
 
 Game::~Game() {
