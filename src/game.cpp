@@ -3,6 +3,10 @@
 #include "game.h"
 using namespace std;
 
+void Game::setup() {
+    // TODO: setup game objects
+}
+
 Game::Game() {
     isRunning = false;
     cout << "Game constructor called" << endl;
@@ -60,6 +64,7 @@ void Game::initialize() {
 }
 
 void Game::run() {
+    setup();
     while (isRunning) {
         processInput();
         update();
@@ -96,10 +101,13 @@ void Game::update() {
 }
 
 void Game::render() {
-    SDL_SetRenderDrawColor(renderer, 255, 64, 32, 255);
+    SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
 
-    // TODO: render game objects...
+    // Draw a rectangle
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // call this to assign the color to the object
+    SDL_Rect playrRect = { 10, 10, 20, 20 };
+    SDL_RenderFillRect(renderer, &playrRect);
 
     SDL_RenderPresent(renderer);
 }

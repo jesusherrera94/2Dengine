@@ -12,6 +12,7 @@ class Game {
     public:
         int windowWidth;
         int windowHeight;
+        void setup();
         Game();
         ~Game();
         void initialize();
