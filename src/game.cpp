@@ -1,10 +1,18 @@
 #include <iostream>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <glm/glm.hpp>
+
 #include "game.h"
 using namespace std;
 
+
+glm::vec2 playerPosition;
+glm::vec2 playerVelocity;
+
 void Game::setup() {
-    // TODO: setup game objects
+    playerPosition = glm::vec2(10.0, 20.0);
+    playerVelocity = glm::vec2(1.0, 0.0);
 }
 
 Game::Game() {
@@ -97,17 +105,29 @@ void Game::processInput() {
 }
 
 void Game::update() {
-    // TODO: update game objects
+    playerPosition.x += playerVelocity.x;
+    playerPosition.y += playerVelocity.y;
 }
 
 void Game::render() {
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
 
-    // Draw a rectangle
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // call this to assign the color to the object
-    SDL_Rect playrRect = { 10, 10, 20, 20 };
-    SDL_RenderFillRect(renderer, &playrRect);
+    // Load a png texture
+    SDL_Surface* surface = IMG_Load("./assets/images/tank-tiger-right.png");
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+
+    // Define source and destination rectangles for rendering
+    SDL_Rect dstRect {
+        static_cast<int>(playerPosition.x),
+        static_cast<int>(playerPosition.y),
+        32,
+        32
+        }; // x, y, width, height
+    SDL_RenderCopy(renderer, texture, NULL, &dstRect);
+
+    SDL_DestroyTexture(texture); // Clean up the texture after rendering
 
     SDL_RenderPresent(renderer);
 }
