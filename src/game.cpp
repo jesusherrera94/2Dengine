@@ -1,7 +1,19 @@
 #include <iostream>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <glm/glm.hpp>
+
 #include "game.h"
 using namespace std;
+
+
+glm::vec2 playerPosition;
+glm::vec2 playerVelocity;
+
+void Game::setup() {
+    playerPosition = glm::vec2(10.0, 20.0);
+    playerVelocity = glm::vec2(50.0, 5.0);
+}
 
 Game::Game() {
     isRunning = false;
@@ -60,6 +72,7 @@ void Game::initialize() {
 }
 
 void Game::run() {
+    setup();
     while (isRunning) {
         processInput();
         update();
@@ -92,14 +105,42 @@ void Game::processInput() {
 }
 
 void Game::update() {
-    // TODO: update game objects
+    // TODO: If the update is running too fast
+    // waste thime until we reach the MILLISECONDS_PER_FRAME
+    Uint32 timeToWait = MILLISECONDS_PER_FRAME - (SDL_GetTicks() - millisecondsPreviousFrame);
+    if (timeToWait > 0  && timeToWait <= MILLISECONDS_PER_FRAME) {
+        SDL_Delay(timeToWait);
+    }   
+
+    // the difference in ticks since the last frame, converted to seconds.
+    double deltaTime = (SDL_GetTicks() - millisecondsPreviousFrame) / 1000.0;
+
+    // store the current frame time
+    millisecondsPreviousFrame = SDL_GetTicks();
+
+    playerPosition.x += playerVelocity.x * deltaTime;
+    playerPosition.y += playerVelocity.y * deltaTime;
 }
 
 void Game::render() {
-    SDL_SetRenderDrawColor(renderer, 255, 64, 32, 255);
+    SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
 
-    // TODO: render game objects...
+    // Load a png texture
+    SDL_Surface* surface = IMG_Load("./assets/images/tank-tiger-right.png");
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+
+    // Define source and destination rectangles for rendering
+    SDL_Rect dstRect {
+        static_cast<int>(playerPosition.x),
+        static_cast<int>(playerPosition.y),
+        32,
+        32
+        }; // x, y, width, height
+    SDL_RenderCopy(renderer, texture, NULL, &dstRect);
+
+    SDL_DestroyTexture(texture); // Clean up the texture after rendering
 
     SDL_RenderPresent(renderer);
 }
