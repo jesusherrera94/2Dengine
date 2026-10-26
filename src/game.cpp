@@ -105,6 +105,14 @@ void Game::processInput() {
 }
 
 void Game::update() {
+    // TODO: If the update is running too fast
+    // waste thime until we reach the MILLISECONDS_PER_FRAME
+    // Lock the execution of the game loop to maintain a consistent frame rate
+    while (!SDL_TICKS_PASSED(SDL_GetTicks(), millisecondsPreviousFrame + MILLISECONDS_PER_FRAME));
+    
+    // store the current frame time
+    millisecondsPreviousFrame = SDL_GetTicks();
+
     playerPosition.x += playerVelocity.x;
     playerPosition.y += playerVelocity.y;
 }
