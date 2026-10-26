@@ -107,8 +107,10 @@ void Game::processInput() {
 void Game::update() {
     // TODO: If the update is running too fast
     // waste thime until we reach the MILLISECONDS_PER_FRAME
-    // Lock the execution of the game loop to maintain a consistent frame rate
-    while (!SDL_TICKS_PASSED(SDL_GetTicks(), millisecondsPreviousFrame + MILLISECONDS_PER_FRAME));
+    Uint32 timeToWait = MILLISECONDS_PER_FRAME - (SDL_GetTicks() - millisecondsPreviousFrame);
+    if (timeToWait > 0  && timeToWait <= MILLISECONDS_PER_FRAME) {
+        SDL_Delay(timeToWait);
+    }
     
     // store the current frame time
     millisecondsPreviousFrame = SDL_GetTicks();

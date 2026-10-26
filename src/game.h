@@ -11,7 +11,7 @@ class Game {
     bool isRunning;
     SDL_Window* window;
     SDL_Renderer* renderer;
-    int millisecondsPreviousFrame = 0;
+    Uint32 millisecondsPreviousFrame = 0;
 
     public:
         int windowWidth;
