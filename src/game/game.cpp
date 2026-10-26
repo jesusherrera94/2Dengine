@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "game.h"
-#include "logger.h"
+#include "../logger/logger.h"
 using namespace std;
 
 
@@ -19,7 +19,6 @@ void Game::setup() {
 Game::Game() {
     isRunning = false;
     Logger::Log("Game constructor called");
-    Logger::Err("Testing errors!!!!!!!");
 }
 
 Game::~Game() {
