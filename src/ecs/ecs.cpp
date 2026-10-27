@@ -7,10 +7,18 @@ int Entity::getId() const {
 void System::addEntityToSystem(Entity entity) {
     entities.push_back(entity);
 }
+
 void System::removeEntityFromSystem(Entity entity) {
-    auto it = std::find(entities.begin(), entities.end(), entity);
-    entities.erase(it);
+    entities.erase(std::remove_if(
+        entities.begin(),
+        entities.end(),
+        // recieves the entity from the function arg
+        [&entity](Entity other) {
+            return entity.getId() == other.getId();
+        }),
+        entities.end());
 }
+
 std::vector<Entity> System::getSystemEntities() const {
     return entities;
 }
