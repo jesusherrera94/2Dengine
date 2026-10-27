@@ -14,7 +14,7 @@ void System::removeEntityFromSystem(Entity entity) {
         entities.end(),
         // recieves the entity from the function arg
         [&entity](Entity other) {
-            return entity.getId() == other.getId();
+            return entity == other;
         }),
         entities.end());
 }
