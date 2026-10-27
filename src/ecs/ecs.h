@@ -55,7 +55,7 @@ class System {
         void addEntityToSystem(Entity entity);
         void removeEntityFromSystem(Entity entity);
         std::vector<Entity> getSystemEntities() const;
-        Signature& getComponentSignature() const;
+       const Signature& getComponentSignature() const;
         /*
         * Defines the component type that entities must have to be considered by the system
         */
