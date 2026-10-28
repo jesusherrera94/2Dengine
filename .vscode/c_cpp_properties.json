@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/libs",
-                "${workspaceFolder}/libs/**"
+                "${workspaceFolder}/libs/**",
+                "/opt/homebrew/opt/sdl2-compat/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
