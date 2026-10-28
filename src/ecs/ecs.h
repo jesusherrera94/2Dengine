@@ -69,9 +69,62 @@ class System {
         template <typename TComponent> void requiredComponent();
 };
 
-// Class that handles everything
-class Registry {
+class IPool {
+    public:
+        virtual ~IPool(){}
+};
 
+/**
+ * Pool is just a vector (continous data) ob objects of type T
+ */
+ template <typename T>
+ class Pool: IPool{
+    private:
+        std::vector<T> data;
+    public:
+        Pool(int size=100){
+            data.resize(size);
+        }
+        virtual ~Pool() = default;
+        bool isEmpty() const {
+            return data.empty()
+        }
+        int getSize() const {
+            return data.size();
+        }
+        void resize(int n) {
+            data.resize(n);
+        }
+        void clear() {
+            data.clear();
+        }
+        void add(T object) {
+            data.push_back(object);
+        }
+        void set(int index, T object) {
+            data[index] = object;
+        }
+        T& get(int index) {
+            return static_cast<T&>(data[index]);
+        }
+        T& operator [] (unsigned int index) {
+            return data[index];
+        }
+ };
+
+
+/*
+* Registry:
+* <Manager, World, Coordinator, Orchastor> Manages the creation and destruction of entities, as well as
+* adding systems and adding components to entities
+*/
+class Registry {
+    private:
+        int numEntities = 0;
+        // Vector component tools, each pool contains all the data for a certain component type
+        // Vector index = component type id
+        // Pool index = entity id
+        std::vector<IPool*> componentPool;
 };
 
 template <typename TComponent>
