@@ -45,3 +45,21 @@ void Registry::update() {
     // remove the entities that are waiting to be removed in the active system
 
 }
+
+void Registry::addEntityToSystems(Entity entity) {
+    const auto entityId = entity.getId();
+
+    const auto& entityComponentSignature = entityComponentSignatures[entityId];
+
+    //loop all the systems
+    for (auto& system : systems) {
+        const auto& systemComponentSignature = system.second->getComponentSignature();
+        // bitwise and to get if the signatures match to see if the component is interested on the component
+        bool isInterest = (entityComponentSignature & systemComponentSignature) == systemComponentSignature;
+        if (isInterest) {
+            // TODO add entity to to the system
+            system.second->addEntityToSystem(entity);
+        }
+    }
+
+}
