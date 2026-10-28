@@ -2,6 +2,7 @@
 #define ECS_H
 
 #include <bitset>
+#include <set>
 #include <vector>
 #include <unordered_map>
 #include <typeindex>
@@ -89,7 +90,7 @@ class IPool {
         }
         virtual ~Pool() = default;
         bool isEmpty() const {
-            return data.empty()
+            return data.empty();
         }
         int getSize() const {
             return data.size();
@@ -133,9 +134,16 @@ class Registry {
         std::vector<Signature> entityComponentSignature;
         // Map of active systems [index = system typeid]
         std::unordered_map<std::type_index, System*> systems;
+
+        // Set of entities that are flagged to be added or removed on the next registry update;
+        std::set<Entity> entitiesToBeAdded;
+        std::set<Entity> entitiesToBeRemoved;
     public:
         Registry() = default;
-        
+        void update();
+        Entity createEntity();
+        void addEntityToSystem(Entity entity);
+
 };
 
 template <typename TComponent>
