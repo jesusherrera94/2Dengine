@@ -31,10 +31,17 @@ const Signature& System::getComponentSignature() const {
 };
 
 Entity Registry::createEntity() {
-    int entityId = numEntities++;
+    int entityId;
+    entityId = numEntities++;
 
     Entity entity(entityId);
+    entity.registry = this; // setting the entity to itself
     entitiesToBeAdded.insert(entity);
+
+    if (entityId >= entityComponentSignatures.size()) {
+        entityComponentSignatures.resize(entityId + 1);
+    }
+
     Logger::Log("Entity created with id: " + std::to_string(entityId));
     return entity;
 }
@@ -42,6 +49,10 @@ Entity Registry::createEntity() {
 void Registry::update() {
 
     // Add the entities that are waiting to be created to the active system
+    for(auto entity: entitiesToBeAdded) {
+        addEntityToSystems(entity);
+    }
+    entitiesToBeAdded.clear();
     // remove the entities that are waiting to be removed in the active system
 
 }
