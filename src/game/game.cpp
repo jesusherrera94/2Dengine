@@ -6,6 +6,9 @@
 #include "../ecs/ecs.h"
 #include "game.h"
 #include "../logger/logger.h"
+#include "../components/transformComponent.h"
+#include "../components/rigidBodyComponent.h"
+
 using namespace std;
 
 
@@ -13,7 +16,10 @@ using namespace std;
 void Game::setup() {
     // Create some entity
     Entity tank = registry->createEntity();
-    Entity truck = registry->createEntity();
+    
+    // add some components
+    registry->addComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
+    registry->addComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
 }
 
 Game::Game() {

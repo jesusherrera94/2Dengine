@@ -6,6 +6,7 @@
 #include <vector>
 #include <unordered_map>
 #include <typeindex>
+#include "../logger/logger.h"
 
 const unsigned int MAX_COMPONENT = 32;
 
@@ -25,7 +26,8 @@ struct IComponent {
 */
 template<typename T>
 class Component: public IComponent {
-    /*
+   public:
+   /*
     * Returns the unique id of Component<T>
     */
     static int getId() {
@@ -81,7 +83,7 @@ class IPool {
  * Pool is just a vector (continous data) ob objects of type T
  */
  template <typename T>
- class Pool: IPool{
+ class Pool: public IPool{
     private:
         std::vector<T> data;
     public:
@@ -193,6 +195,7 @@ void Registry::addComponent(Entity entity, TArgs&& ...args) {
     TComponent newComponent(std::forward<TArgs>(args)...);
     componentPool->set(entityId, newComponent);
     entityComponentSignatures[entityId].set(componentId);
+    Logger::Log("Component id = " + std::to_string(componentId) + " was added to entity id: " + std::to_string(entityId));
 }
 
 template <typename TComponent>
