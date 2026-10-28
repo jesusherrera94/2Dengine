@@ -127,7 +127,7 @@ class Registry {
         // Vector component tools, each pool contains all the data for a certain component type
         // [Vector index = component type id]
         // [Pool index = entity id]
-        std::vector<IPool*> componentPool;
+        std::vector<IPool*> componentPools;
         // Vector of components signatures.
         // The signature let us know which components are turned "on" for an entity
         // [vector index = entity id]
@@ -143,6 +143,7 @@ class Registry {
         void update();
         Entity createEntity();
         void addEntityToSystem(Entity entity);
+        template<typename TComponent, typename ...TArgs> void addComponent(Entity entity, TArgs&& ...args);
 
 };
 
@@ -150,6 +151,31 @@ template <typename TComponent>
 void System::requiredComponent() {
     const auto componentId = Component<TComponent>::getId();
     componentSignature.set(componentId);
+}
+
+template<typename TComponent, typename ...TArgs>
+void Registry::addComponent(Entity entity, TArgs&& ...args) {
+    const auto componentId = Component<TComponent>::getId();
+    const auto entityId = entity.getId();
+
+    if (componentId >= componentPools.size()) {
+        componentPools.resize(componentId + 1, nullptr);
+    }
+
+    if (!componentPools[componentId]) {
+        Pool<TComponent>* newComponentPool = new Pool<TComponent>();
+        componentPools[componentId] = newComponentPool;
+    }
+    // get the pool of component values for that component type
+    Pool<TComponent>* componentPool = Pool<TComponent>(componentPools[componentId]);
+
+    if(entityId >= componentPool->getSize()) {
+        componentPool->resize(numEntities);
+    }
+
+    TComponent newComponent(std::forward<TArgs>(args)...);
+    componentPool->set(entityId, newComponent);
+    entityComponentSignature[entityId].set(componentId);
 }
 
 #endif
