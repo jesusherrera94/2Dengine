@@ -202,7 +202,7 @@ void Registry::removeComponent(Entity entity) {
 }
 
 template <typename TComponent>
-bool Registry::hasComponent(Entity Entity) const {
+bool Registry::hasComponent(Entity entity) const {
     const auto componentId = Component<TComponent>::getId();
     const auto entityId = entity.getId();
     return entityComponentSignatures[entityId].test(componentId);
@@ -232,7 +232,7 @@ TSystem& Registry::getSystem() const {
     auto systemKey = systems.find(std::type_index(typeid(TSystem)));
     // converts the systemsKey that has the key value pair in 
     // the first -> key , second -> value
-    return *(std::static_pointer_cast<TSystem>(system->second));
+    return *(std::static_pointer_cast<TSystem>(systemKey->second));
 }
 
 #endif
