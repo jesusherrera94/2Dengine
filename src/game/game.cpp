@@ -18,8 +18,11 @@ void Game::setup() {
     Entity tank = registry->createEntity();
     
     // add some components
-    registry->addComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
-    registry->addComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
+    // registry->addComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
+    // registry->addComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
+    tank.addComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
+    tank.addComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
+
 }
 
 Game::Game() {

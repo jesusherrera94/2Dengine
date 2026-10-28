@@ -49,6 +49,14 @@ class Entity {
         bool operator != (const Entity& other) const {return id != other.id; }
         bool operator > (const Entity& other) const {return id > other.id; }
         bool operator < (const Entity& other) const {return id < other.id; }
+        template<typename TComponent, typename ...TArgs> void addComponent(TArgs&& ...args);
+        template<typename TComponent> void removeComponent();
+        template<typename TComponent> bool hasComponent() const;
+        template<typename TComponent> TComponent& getComponent();
+        // Hold a pointer to the entity's owner resgitry
+        // This is a kind of adapter to give the entity the resoponsability of 
+        // managing the components and avoid using the registry to add components to the entity
+        class Registry* registry; //forward declaration
 };
 
 
@@ -156,6 +164,7 @@ class Registry {
         template<typename TComponent, typename ...TArgs> void addComponent(Entity entity, TArgs&& ...args);
         template<typename TComponent> void removeComponent(Entity entity);
         template<typename TComponent> bool hasComponent(Entity entity) const;
+        template<typename TComponent> TComponent& getComponent(Entity entity) const;
     
         // System management
         template<typename TSystem, typename ...TArgs> void addSystem(TArgs&& ...args);
@@ -203,6 +212,8 @@ void Registry::removeComponent(Entity entity) {
     const auto componentId = Component<TComponent>::getId();
     const auto entityId = entity.getId();
     entityComponentSignatures[entityId].set(componentId, false);
+    Logger::Log("Component id = " + std::to_string(componentId) + " was removed from entity id: " + std::to_string(entityId));
+
 }
 
 template <typename TComponent>
@@ -210,6 +221,13 @@ bool Registry::hasComponent(Entity entity) const {
     const auto componentId = Component<TComponent>::getId();
     const auto entityId = entity.getId();
     return entityComponentSignatures[entityId].test(componentId);
+}
+
+template<typename TComponent> TComponent& Registry::getComponent(Entity entity) const {
+    const auto componentId = Component<TComponent>::getId();
+    const auto entityId = entity.getId();
+    auto componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
+    return componentPool->get(entityId);
 }
 
 // System management
@@ -237,6 +255,20 @@ TSystem& Registry::getSystem() const {
     // converts the systemsKey that has the key value pair in 
     // the first -> key , second -> value
     return *(std::static_pointer_cast<TSystem>(systemKey->second));
+}
+
+// entity-component handling
+template<typename TComponent, typename ...TArgs> void Entity::addComponent(TArgs&& ...args){
+    registry->addComponent<TComponent>(*this, std::forward<TArgs>(args)...);
+}
+template<typename TComponent> void Entity::removeComponent() {
+    registry->removeComponent<TComponent>(*this);
+}
+template<typename TComponent> bool Entity::hasComponent() const {
+    return registry->hasComponent<TComponent>(*this);
+}
+template<typename TComponent> TComponent& Entity::getComponent() {
+    return registry->getComponent<TComponent>(*this);
 }
 
 #endif
