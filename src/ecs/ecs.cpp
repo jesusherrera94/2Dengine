@@ -1,6 +1,8 @@
 #include "ecs.h"
 #include "../logger/logger.h"
 
+int IComponent::nextId = 0;
+
 int Entity::getId() const {
     return id;
 }

@@ -144,6 +144,8 @@ class Registry {
         Entity createEntity();
         void addEntityToSystem(Entity entity);
         template<typename TComponent, typename ...TArgs> void addComponent(Entity entity, TArgs&& ...args);
+        template<typename TComponent> void removeComponent(Entity entity);
+        template<typename TComponent> bool hasComponent(Entity entity) const;
 
 };
 
@@ -176,6 +178,20 @@ void Registry::addComponent(Entity entity, TArgs&& ...args) {
     TComponent newComponent(std::forward<TArgs>(args)...);
     componentPool->set(entityId, newComponent);
     entityComponentSignature[entityId].set(componentId);
+}
+
+template <typename TComponent>
+void Registry::removeComponent(Entity entity) {
+    const auto componentId = Component<TComponent>::getId();
+    const auto entityId = entity.getId();
+    entityComponentSignature[entityId].set(componentId, false);
+}
+
+template <typename TComponent>
+bool Registry::hasComponent(Entity Entity) const {
+    const auto componentId = Component<TComponent>::getId();
+    const auto entityId = entity.getId();
+    return entityComponentSignature[entityId].test(componentId);
 }
 
 #endif
