@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <SDL2/SDL.h>
+#include "../ecs/ecs.h"
 
 const int FPS = 60;
 const int MILLISECONDS_PER_FRAME = 1000 / FPS;
@@ -12,6 +13,8 @@ class Game {
     SDL_Window* window;
     SDL_Renderer* renderer;
     Uint32 millisecondsPreviousFrame = 0;
+
+    Registry* registry;
 
     public:
         int windowWidth;

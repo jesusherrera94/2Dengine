@@ -11,15 +11,14 @@ using namespace std;
 
 
 void Game::setup() {
-    // TODO: create an entity tank
-    // Entity tank = registry.createEnity();
-    // tank.addComponent<TransformComponent>();
-    // tank.addComponent<BoxColliderComponent>();
-    // tank.addComponent<SpriteComponent>("./assets/images/tank.png");
+    // Create some entity
+    Entity tank = registry->createEntity();
+    Entity truck = registry->createEntity();
 }
 
 Game::Game() {
     isRunning = false;
+    registry = new Registry();
     Logger::Log("Game constructor called");
 }
 
