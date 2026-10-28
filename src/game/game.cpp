@@ -18,7 +18,7 @@ void Game::setup() {
 
 Game::Game() {
     isRunning = false;
-    registry = new Registry();
+    registry = std::make_unique<Registry>(); // intanciate a registry object
     Logger::Log("Game constructor called");
 }
 

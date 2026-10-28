@@ -14,7 +14,7 @@ class Game {
     SDL_Renderer* renderer;
     Uint32 millisecondsPreviousFrame = 0;
 
-    Registry* registry;
+    std::unique_ptr<Registry> registry;
 
     public:
         int windowWidth;
