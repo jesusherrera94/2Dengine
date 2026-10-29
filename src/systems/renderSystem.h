@@ -1,12 +1,15 @@
 #ifndef RENDER_SYSTEM_H
 #define RENDER_SYSTEM_H
 
+#include <vector>
+#include <algorithm>
 #include <SDL2/SDL.h>
 
 #include "../ecs/ecs.h"
 #include "../components/transformComponent.h"
 #include "../components/spriteComponent.h"
 #include "../assetStore/assetStore.h"
+#include "../logger/logger.h"
 
 class RenderSystem: public System {
     public:
@@ -15,8 +18,17 @@ class RenderSystem: public System {
             requiredComponent<SpriteComponent>();
         }
         void update(SDL_Renderer* renderer, std::unique_ptr<AssetStore>& assetStore) {
+
+            // sort all the entities of our system by z-index
+            std::vector<Entity> entities = getSystemEntities();
+            std::sort(entities.begin(), entities.end(), [](Entity& a, Entity& b) {
+                auto spriteA = a.getComponent<SpriteComponent>();
+                auto spriteB = b.getComponent<SpriteComponent>();
+                return spriteA.zIndex < spriteB.zIndex;
+            });
+
             // TODO: Implement movement logic here
-            for (auto entity : getSystemEntities()) {
+            for (auto entity : entities) {
                 TransformComponent transform = entity.getComponent<TransformComponent>();
                 const SpriteComponent sprite = entity.getComponent<SpriteComponent>();
 
@@ -41,6 +53,7 @@ class RenderSystem: public System {
                     NULL,
                     SDL_FLIP_NONE
                 );
+                Logger::Err("Sprite with index has been rendered: " + std::to_string(sprite.zIndex));
             };
         }
 };

@@ -34,7 +34,7 @@ void Game::loadMap() {
 
             Entity tile = registry->createEntity();
             tile.addComponent<TransformComponent>(glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)), glm::vec2(tileScale, tileScale), 0.0);
-            tile.addComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, srcRectX, srcRectY);
+            tile.addComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, srcRectX, srcRectY);
         }
     }
     mapFile.close();
@@ -64,12 +64,12 @@ void Game::loadLevel(int level) {
     // registry->addComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
     tank.addComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
     tank.addComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
-    tank.addComponent<SpriteComponent>("tank-image", 32,32);
+    tank.addComponent<SpriteComponent>("tank-image", 32,32, 2);
 
     Entity truck = registry->createEntity();
     truck.addComponent<TransformComponent>(glm::vec2(50.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
     truck.addComponent<RigidBodyComponent>(glm::vec2(0.0, 50.0));
-    truck.addComponent<SpriteComponent>("truck-image", 32,32);
+    truck.addComponent<SpriteComponent>("truck-image", 32,32, 1);
 }
 
 
