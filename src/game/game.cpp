@@ -8,12 +8,15 @@
 #include "../logger/logger.h"
 #include "../components/transformComponent.h"
 #include "../components/rigidBodyComponent.h"
+#include "../systems/movementSystem.h";
 
 using namespace std;
 
 
 
 void Game::setup() {
+    // add system
+    registry->addSystem<MovementSystem>();
     // Create some entity
     Entity tank = registry->createEntity();
     
@@ -130,9 +133,10 @@ void Game::update() {
     millisecondsPreviousFrame = SDL_GetTicks();
 
    // TODO:
-   // MovementSystem.update();
-   // CollisionSystem.update();
-   // DamageSystem.update();
+   registry->getSystem<MovementSystem>().update();
+
+   // Update the registry to process the entities that are waiting to be create or deleted
+   registry->update();
 }
 
 void Game::render() {
