@@ -19,14 +19,7 @@ class RenderSystem: public System {
                 TransformComponent transform = entity.getComponent<TransformComponent>();
                 const SpriteComponent sprite = entity.getComponent<SpriteComponent>();
 
-                SDL_Rect obRect = {
-                    static_cast<int>(transform.position.x),
-                    static_cast<int>(transform.position.y),
-                    sprite.width,
-                    sprite.height
-                };
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-                SDL_RenderFillRect(renderer, &obRect);
+                // Draw the PNG texture in the screen
 
             };
         }

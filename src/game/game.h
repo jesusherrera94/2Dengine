@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include "../ecs/ecs.h"
+#include "../assetStore/assetStore.h"
 
 const int FPS = 60;
 const int MILLISECONDS_PER_FRAME = 1000 / FPS;
@@ -15,6 +16,7 @@ class Game {
     Uint32 millisecondsPreviousFrame = 0;
 
     std::unique_ptr<Registry> registry;
+    std::unique_ptr<AssetStore> assetStore;
 
     public:
         int windowWidth;
