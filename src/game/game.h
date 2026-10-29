@@ -18,6 +18,8 @@ class Game {
     std::unique_ptr<Registry> registry;
     std::unique_ptr<AssetStore> assetStore;
 
+    void loadMap();
+
     public:
         int windowWidth;
         int windowHeight;

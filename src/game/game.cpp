@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <glm/glm.hpp>
+#include <fstream>
 
 #include "../ecs/ecs.h"
 #include "game.h"
@@ -14,6 +15,31 @@
 
 using namespace std;
 
+void Game::loadMap() {
+    int tileSize = 32;
+    double tileScale = 2.0;
+    int mapNumCols = 25;
+    int mapNumRows = 20;
+    std::fstream mapFile;
+    mapFile.open("./assets/tilemaps/jungle.map");
+
+    for (int y=0; y< mapNumRows; y++) {
+        for (int x=0; x<mapNumCols; x++) {
+            char ch;
+            mapFile.get(ch);
+            int srcRectY = std::atoi(&ch) * tileSize;
+            mapFile.get(ch);
+            int srcRectX = std::atoi(&ch) * tileSize;
+            mapFile.ignore();
+
+            Entity tile = registry->createEntity();
+            tile.addComponent<TransformComponent>(glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)), glm::vec2(tileScale, tileScale), 0.0);
+            tile.addComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, srcRectX, srcRectY);
+        }
+    }
+    mapFile.close();
+}
+
 
 void Game::loadLevel(int level) {
     // add system
@@ -22,14 +48,12 @@ void Game::loadLevel(int level) {
 
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
-    assetStore->addTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
+    assetStore->addTexture(renderer, "truck-image", "./assets/images/truck-ford-down.png");
+    assetStore->addTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
 
 
     // load the tile map
-    // we need to load the tilemap texture './assets/tilemaps/jungle.png'
-    // we need to load the file './assets/tilemaps/jungle.map'
-    // Tip: you can use the idea of the source rectangle
-    // Tip: consider creating one entity per tile
+    loadMap();
 
 
     // Create some entity
@@ -75,8 +99,8 @@ void Game::initialize() {
     // Fake fullscreen
     SDL_DisplayMode displayMode;
     SDL_GetCurrentDisplayMode(0, &displayMode);
-    windowWidth = 800; // displayMode.w;
-    windowHeight = 600; // displayMode.h;
+    windowWidth = displayMode.w;
+    windowHeight = displayMode.h;
 
     window = SDL_CreateWindow(
         NULL,
