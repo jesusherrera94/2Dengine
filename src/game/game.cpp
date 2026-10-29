@@ -8,7 +8,7 @@
 #include "../logger/logger.h"
 #include "../components/transformComponent.h"
 #include "../components/rigidBodyComponent.h"
-#include "../systems/movementSystem.h";
+#include "../systems/movementSystem.h"
 
 using namespace std;
 
@@ -132,11 +132,12 @@ void Game::update() {
     // store the current frame time
     millisecondsPreviousFrame = SDL_GetTicks();
 
-   // TODO:
-   registry->getSystem<MovementSystem>().update();
 
    // Update the registry to process the entities that are waiting to be create or deleted
    registry->update();
+
+   // TODO:
+   registry->getSystem<MovementSystem>().update(deltaTime);
 }
 
 void Game::render() {

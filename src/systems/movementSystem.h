@@ -11,14 +11,14 @@ class MovementSystem: public System {
             requiredComponent<TransformComponent>();
             requiredComponent<RigidBodyComponent>();
         }
-        void update() {
+        void update(double deltaTime) {
             // TODO: Implement movement logic here
             for (auto entity : getSystemEntities()) {
                 TransformComponent& transform = entity.getComponent<TransformComponent>();
                 const RigidBodyComponent rigidBodyComponent = entity.getComponent<RigidBodyComponent>();
 
-                transform.position.x += rigidBodyComponent.velocity.x;
-                transform.position.y += rigidBodyComponent.velocity.y;
+                transform.position.x += rigidBodyComponent.velocity.x * deltaTime;
+                transform.position.y += rigidBodyComponent.velocity.y * deltaTime;
             }
         }
 };
