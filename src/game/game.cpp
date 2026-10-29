@@ -48,7 +48,7 @@ void Game::loadLevel(int level) {
 
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
-    assetStore->addTexture(renderer, "truck-image", "./assets/images/truck-ford-down.png");
+    assetStore->addTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
     assetStore->addTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
 
 
@@ -62,13 +62,13 @@ void Game::loadLevel(int level) {
     // add some components
     // registry->addComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
     // registry->addComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
-    tank.addComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
+    tank.addComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(2.0, 2.0), 0.0);
     tank.addComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
     tank.addComponent<SpriteComponent>("tank-image", 32,32, 2);
 
     Entity truck = registry->createEntity();
-    truck.addComponent<TransformComponent>(glm::vec2(50.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
-    truck.addComponent<RigidBodyComponent>(glm::vec2(0.0, 50.0));
+    truck.addComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(2.0, 2.0), 0.0);
+    truck.addComponent<RigidBodyComponent>(glm::vec2(60.0, 0.0));
     truck.addComponent<SpriteComponent>("truck-image", 32,32, 1);
 }
 
