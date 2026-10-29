@@ -8,7 +8,9 @@
 #include "../logger/logger.h"
 #include "../components/transformComponent.h"
 #include "../components/rigidBodyComponent.h"
+#include "../components/spriteComponent.h"
 #include "../systems/movementSystem.h"
+#include "../systems/renderSystem.h"
 
 using namespace std;
 
@@ -17,6 +19,8 @@ using namespace std;
 void Game::setup() {
     // add system
     registry->addSystem<MovementSystem>();
+    registry->addSystem<RenderSystem>();
+
     // Create some entity
     Entity tank = registry->createEntity();
     
@@ -25,7 +29,12 @@ void Game::setup() {
     // registry->addComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
     tank.addComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
     tank.addComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
+    tank.addComponent<SpriteComponent>(10,10);
 
+    Entity truck = registry->createEntity();
+    truck.addComponent<TransformComponent>(glm::vec2(50.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
+    truck.addComponent<RigidBodyComponent>(glm::vec2(0.0, 50.0));
+    truck.addComponent<SpriteComponent>(10,50);
 }
 
 Game::Game() {
@@ -136,7 +145,7 @@ void Game::update() {
    // Update the registry to process the entities that are waiting to be create or deleted
    registry->update();
 
-   // TODO:
+   // Invoke all the systems that need to update
    registry->getSystem<MovementSystem>().update(deltaTime);
 }
 
@@ -144,8 +153,8 @@ void Game::render() {
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
 
-   // TODO:
-   // render game object....
+   // Invoke all the system that need to render
+   registry->getSystem<RenderSystem>().update(renderer);
 
     SDL_RenderPresent(renderer);
 }
