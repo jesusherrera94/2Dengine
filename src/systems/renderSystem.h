@@ -1,11 +1,15 @@
 #ifndef RENDER_SYSTEM_H
 #define RENDER_SYSTEM_H
 
+#include <vector>
+#include <algorithm>
 #include <SDL2/SDL.h>
 
 #include "../ecs/ecs.h"
 #include "../components/transformComponent.h"
 #include "../components/spriteComponent.h"
+#include "../assetStore/assetStore.h"
+#include "../logger/logger.h"
 
 class RenderSystem: public System {
     public:
@@ -13,21 +17,42 @@ class RenderSystem: public System {
             requiredComponent<TransformComponent>();
             requiredComponent<SpriteComponent>();
         }
-        void update(SDL_Renderer* renderer) {
+        void update(SDL_Renderer* renderer, std::unique_ptr<AssetStore>& assetStore) {
+
+            // sort all the entities of our system by z-index
+            std::vector<Entity> entities = getSystemEntities();
+            std::sort(entities.begin(), entities.end(), [](Entity& a, Entity& b) {
+                auto spriteA = a.getComponent<SpriteComponent>();
+                auto spriteB = b.getComponent<SpriteComponent>();
+                return spriteA.zIndex < spriteB.zIndex;
+            });
+
             // TODO: Implement movement logic here
-            for (auto entity : getSystemEntities()) {
+            for (auto entity : entities) {
                 TransformComponent transform = entity.getComponent<TransformComponent>();
                 const SpriteComponent sprite = entity.getComponent<SpriteComponent>();
 
-                SDL_Rect obRect = {
+                // set the source rectangle of our original sprite texture
+                SDL_Rect srcRect = sprite.srcRect;
+
+                // set the destination rectangle with the X,Y position to be rendered
+                SDL_Rect destRect = {
                     static_cast<int>(transform.position.x),
                     static_cast<int>(transform.position.y),
-                    sprite.width,
-                    sprite.height
+                    static_cast<int>(sprite.width * transform.scale.x),
+                    static_cast<int>(sprite.width * transform.scale.y),
                 };
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-                SDL_RenderFillRect(renderer, &obRect);
 
+                // Draw the PNG texture in the screen
+                SDL_RenderCopyEx(
+                    renderer,
+                    assetStore->getTexture(sprite.assetId),
+                    &srcRect,
+                    &destRect,
+                    transform.rotation,
+                    NULL,
+                    SDL_FLIP_NONE
+                );
             };
         }
 };
