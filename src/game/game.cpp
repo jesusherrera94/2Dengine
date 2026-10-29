@@ -15,8 +15,7 @@
 using namespace std;
 
 
-
-void Game::setup() {
+void Game::loadLevel(int level) {
     // add system
     registry->addSystem<MovementSystem>();
     registry->addSystem<RenderSystem>();
@@ -24,6 +23,14 @@ void Game::setup() {
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
     assetStore->addTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
+
+
+    // load the tile map
+    // we need to load the tilemap texture './assets/tilemaps/jungle.png'
+    // we need to load the file './assets/tilemaps/jungle.map'
+    // Tip: you can use the idea of the source rectangle
+    // Tip: consider creating one entity per tile
+
 
     // Create some entity
     Entity tank = registry->createEntity();
@@ -39,6 +46,12 @@ void Game::setup() {
     truck.addComponent<TransformComponent>(glm::vec2(50.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
     truck.addComponent<RigidBodyComponent>(glm::vec2(0.0, 50.0));
     truck.addComponent<SpriteComponent>("truck-image", 32,32);
+}
+
+
+
+void Game::setup() {
+    loadLevel(1);
 }
 
 Game::Game() {

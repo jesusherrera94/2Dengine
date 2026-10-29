@@ -31,6 +31,7 @@ class Game {
         void processInput();
         void update();
         void render();
+        void loadLevel(int level);
         
 };
 
