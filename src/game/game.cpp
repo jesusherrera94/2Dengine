@@ -33,12 +33,12 @@ void Game::setup() {
     // registry->addComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
     tank.addComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
     tank.addComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
-    tank.addComponent<SpriteComponent>("tank-image", 10,10);
+    tank.addComponent<SpriteComponent>("tank-image", 32,32);
 
     Entity truck = registry->createEntity();
     truck.addComponent<TransformComponent>(glm::vec2(50.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
     truck.addComponent<RigidBodyComponent>(glm::vec2(0.0, 50.0));
-    truck.addComponent<SpriteComponent>("truck-image", 10,50);
+    truck.addComponent<SpriteComponent>("truck-image", 32,32);
 }
 
 Game::Game() {
@@ -159,7 +159,7 @@ void Game::render() {
     SDL_RenderClear(renderer);
 
    // Invoke all the system that need to render
-   registry->getSystem<RenderSystem>().update(renderer);
+   registry->getSystem<RenderSystem>().update(renderer, assetStore);
 
     SDL_RenderPresent(renderer);
 }
