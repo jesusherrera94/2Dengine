@@ -53,7 +53,6 @@ class RenderSystem: public System {
                     NULL,
                     SDL_FLIP_NONE
                 );
-                Logger::Err("Sprite with index has been rendered: " + std::to_string(sprite.zIndex));
             };
         }
 };
