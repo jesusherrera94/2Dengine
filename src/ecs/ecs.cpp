@@ -7,6 +7,10 @@ int Entity::getId() const {
     return id;
 }
 
+void Entity::kill() {
+    registry->killEntity(*this);
+}
+
 void System::addEntityToSystem(Entity entity) {
     entities.push_back(entity);
 }
@@ -32,18 +36,29 @@ const Signature& System::getComponentSignature() const {
 
 Entity Registry::createEntity() {
     int entityId;
-    entityId = numEntities++;
+
+    if (freeIds.empty()){
+        // if there are no freeIds waiting to be reused
+        entityId = numEntities++;
+        if (entityId >= entityComponentSignatures.size()) {
+            entityComponentSignatures.resize(entityId + 1);
+        }
+    } else {
+        // reuse an id from the list of previously removed entities
+        entityId = freeIds.front();
+        freeIds.pop_front();
+    }
 
     Entity entity(entityId);
     entity.registry = this; // setting the entity to itself
     entitiesToBeAdded.insert(entity);
 
-    if (entityId >= entityComponentSignatures.size()) {
-        entityComponentSignatures.resize(entityId + 1);
-    }
-
     Logger::Log("Entity created with id: " + std::to_string(entityId));
     return entity;
+}
+
+void Registry::killEntity(Entity entity) {
+    entitiesToBeRemoved.insert(entity);
 }
 
 void Registry::update() {
@@ -53,8 +68,15 @@ void Registry::update() {
         addEntityToSystems(entity);
     }
     entitiesToBeAdded.clear();
+    
     // remove the entities that are waiting to be removed in the active system
-
+    for (auto entity: entitiesToBeRemoved) {
+        removeEntitiesFromSystems(entity);
+        entityComponentSignatures[entity.getId()].reset();
+        // make the entity id available to reuse
+        freeIds.push_back(entity.getId());
+    }
+    entitiesToBeRemoved.clear();
 }
 
 void Registry::addEntityToSystems(Entity entity) {
@@ -73,4 +95,10 @@ void Registry::addEntityToSystems(Entity entity) {
         }
     }
 
+}
+
+void Registry::removeEntitiesFromSystems(Entity entity) {
+    for(auto system: systems) {
+        system.second->removeEntityFromSystem(entity);
+    }
 }
