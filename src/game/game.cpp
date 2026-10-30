@@ -15,6 +15,7 @@
 #include "../systems/movementSystem.h"
 #include "../systems/renderSystem.h"
 #include "../systems/animationSystem.h"
+#include "../systems/collisionSystem.h"
 
 using namespace std;
 
@@ -49,6 +50,7 @@ void Game::loadLevel(int level) {
     registry->addSystem<MovementSystem>();
     registry->addSystem<RenderSystem>();
     registry->addSystem<AnimationSystem>();
+    registry->addSystem<CollisionSystem>();
 
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -212,6 +214,7 @@ void Game::update() {
    // Invoke all the systems that need to update
    registry->getSystem<MovementSystem>().update(deltaTime);
    registry->getSystem<AnimationSystem>().update();
+   registry->getSystem<CollisionSystem>().update();
 }
 
 void Game::render() {

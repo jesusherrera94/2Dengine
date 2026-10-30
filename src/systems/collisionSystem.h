@@ -4,6 +4,7 @@
 #include "../ecs/ecs.h"
 #include "../components/boxColliderComponent.h"
 #include "../components/transformComponent.h"
+#include "../logger/logger.h"
 
 class CollisionSystem: public System {
     public:
@@ -12,18 +13,50 @@ class CollisionSystem: public System {
             requiredComponent<TransformComponent>();
         }
         void update() {
-            for (auto entity: getSystemEntities()) {
-                if (!animation.hasFinished) {
-                    // This ensures the frame be between 0 to the number of frames
-                    animation.currentFrame = ((SDL_GetTicks() - animation.startTime) * animation.frameRateSpeed / 1000) % animation.numFrames;
-                    // this will select which "block" will be displayed, if the animation is vertical, should use Y insted
-                    sprite.srcRect.x = animation.currentFrame * sprite.width;
-                    if (!animation.isLoop && animation.currentFrame == (animation.numFrames - 1)) {
-                        animation.hasFinished = true;
-                    }
-                }
+            auto entities = getSystemEntities();
+            // Loop all the entitis that the system is interested in
+            // and make a "right-side" validation to avoid repetition
+            // and reduce the complexity from O(n^2) to something more acceptable.
+            for (auto i = entities.begin(); i != entities.end(); i++) {
+                Entity  a = *i;
+                auto aTransform = a.getComponent<TransformComponent>();
+                auto aCollider = a.getComponent<BoxColliderComponent>();
 
+                for (auto j = i; j != entities.end(); j++) {
+                    Entity b = *j;
+                    if (a==b) {
+                        //bypass if it is the same entity
+                        continue;
+                    }
+                        auto bTransform = b.getComponent<TransformComponent>();
+                        auto bCollider = b.getComponent<BoxColliderComponent>();
+                        // check for the collision between a and b
+                        bool collisionHappened =checkAABBCollision(
+                            aTransform.position.x + aCollider.offset.x,
+                            aTransform.position.y + aCollider.offset.y,
+                            aCollider.width,
+                            aCollider.height,
+                            bTransform.position.x + bCollider.offset.x,
+                            bTransform.position.y + + bCollider.offset.y,
+                            bCollider.width,
+                            bCollider.height
+                        );
+
+                        if (collisionHappened) {
+                            Logger::Log("Entity " + std::to_string(a.getId()) + " is colliding with entity " + std::to_string(b.getId()));
+                            // Emit an event...
+                        }
+                }
             }
+        }
+        // This must be cleaned later
+        bool checkAABBCollision(double aX, double aY, double aWidth, double aHeight, double bX, double bY, double bWidth, double bHeight){
+            return (
+                aX < bX + bWidth
+                && aX + aWidth > bX
+                && aY < bY + bHeight
+                && aY + aHeight > bY
+            );
         }
 };
 
