@@ -14,6 +14,7 @@ class Game {
     SDL_Window* window;
     SDL_Renderer* renderer;
     Uint32 millisecondsPreviousFrame = 0;
+    bool isDebugEnabled = false;
 
     std::unique_ptr<Registry> registry;
     std::unique_ptr<AssetStore> assetStore;
