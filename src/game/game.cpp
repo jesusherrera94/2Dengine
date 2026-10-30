@@ -10,8 +10,10 @@
 #include "../components/transformComponent.h"
 #include "../components/rigidBodyComponent.h"
 #include "../components/spriteComponent.h"
+#include "../components/animationComponent.h"
 #include "../systems/movementSystem.h"
 #include "../systems/renderSystem.h"
+#include "../systems/animationSystem.h"
 
 using namespace std;
 
@@ -45,10 +47,13 @@ void Game::loadLevel(int level) {
     // add system
     registry->addSystem<MovementSystem>();
     registry->addSystem<RenderSystem>();
+    registry->addSystem<AnimationSystem>();
 
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
     assetStore->addTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
+    assetStore->addTexture(renderer, "chopper-image", "./assets/images/chopper.png");
+    assetStore->addTexture(renderer, "radar-image", "./assets/images/radar.png");
     assetStore->addTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
 
 
@@ -70,6 +75,20 @@ void Game::loadLevel(int level) {
     truck.addComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(2.0, 2.0), 0.0);
     truck.addComponent<RigidBodyComponent>(glm::vec2(60.0, 0.0));
     truck.addComponent<SpriteComponent>("truck-image", 32,32, 1);
+
+    Entity choppper = registry->createEntity();
+    choppper.addComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(2.0, 2.0), 0.0);
+    choppper.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
+    choppper.addComponent<SpriteComponent>("chopper-image", 32,32, 1);
+    choppper.addComponent<AnimationComponent>(2, 15, true);
+
+
+    Entity radar = registry->createEntity();
+    radar.addComponent<TransformComponent>(glm::vec2(windowWidth - 184, 10.0), glm::vec2(1.0, 1.0), 0.0);
+    radar.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
+    radar.addComponent<SpriteComponent>("radar-image", 64, 64, 2);
+    radar.addComponent<AnimationComponent>(8, 5, false);
+
 }
 
 
@@ -189,6 +208,7 @@ void Game::update() {
 
    // Invoke all the systems that need to update
    registry->getSystem<MovementSystem>().update(deltaTime);
+   registry->getSystem<AnimationSystem>().update();
 }
 
 void Game::render() {
