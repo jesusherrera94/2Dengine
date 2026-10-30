@@ -1,7 +1,6 @@
 #ifndef SPRITE_COMPONENT_H
 #define SPRITE_COMPONENT_H
 
-#include <string>
 #include <SDL2/SDL.h>
 
 struct SpriteComponent {

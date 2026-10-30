@@ -11,6 +11,7 @@
 #include "../components/rigidBodyComponent.h"
 #include "../components/spriteComponent.h"
 #include "../components/animationComponent.h"
+#include "../components/boxColliderComponent.h"
 #include "../systems/movementSystem.h"
 #include "../systems/renderSystem.h"
 #include "../systems/animationSystem.h"
@@ -67,14 +68,16 @@ void Game::loadLevel(int level) {
     // add some components
     // registry->addComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
     // registry->addComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
-    tank.addComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(2.0, 2.0), 0.0);
-    tank.addComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
+    tank.addComponent<TransformComponent>(glm::vec2(500.0, 10.0), glm::vec2(2.0, 2.0), 0.0);
+    tank.addComponent<RigidBodyComponent>(glm::vec2(-20.0, 0.0));
     tank.addComponent<SpriteComponent>("tank-image", 32,32, 2);
+    tank.addComponent<BoxColliderComponent>(32, 32);
 
     Entity truck = registry->createEntity();
-    truck.addComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(2.0, 2.0), 0.0);
-    truck.addComponent<RigidBodyComponent>(glm::vec2(60.0, 0.0));
+    truck.addComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(2.0, 2.0), 0.0);
+    truck.addComponent<RigidBodyComponent>(glm::vec2(10.0, 0.0));
     truck.addComponent<SpriteComponent>("truck-image", 32,32, 1);
+    truck.addComponent<BoxColliderComponent>(32, 32);
 
     Entity choppper = registry->createEntity();
     choppper.addComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(2.0, 2.0), 0.0);
