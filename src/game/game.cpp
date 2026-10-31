@@ -76,14 +76,12 @@ void Game::loadLevel(int level) {
     tank.addComponent<RigidBodyComponent>(glm::vec2(-20.0, 0.0));
     tank.addComponent<SpriteComponent>("tank-image", 32,32, 2);
     tank.addComponent<BoxColliderComponent>(32, 32);
-    tank.addComponent<DebugColliderRectangle>();
 
     Entity truck = registry->createEntity();
     truck.addComponent<TransformComponent>(glm::vec2(390.0, 250.0), glm::vec2(1.0, 1.0), 0.0);
     truck.addComponent<RigidBodyComponent>(glm::vec2(10.0, 0.0));
     truck.addComponent<SpriteComponent>("truck-image", 32,32, 1);
     truck.addComponent<BoxColliderComponent>(32, 32);
-    truck.addComponent<DebugColliderRectangle>();
 
     Entity choppper = registry->createEntity();
     choppper.addComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
