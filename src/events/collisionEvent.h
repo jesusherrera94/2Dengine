@@ -2,6 +2,7 @@
 #define COLLISION_EVENT_H
 
 #include "../ecs/ecs.h"
+#include "../eventBus/event.h"
 
 
 class CollisionEvent: public Event {
