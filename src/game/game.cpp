@@ -18,6 +18,9 @@
 #include "../systems/collisionSystem.h"
 #include "../systems/debugColliderRectangle.h"
 #include "../systems/damageSystem.h"
+#include "../systems/keyboardMovementSystem.h"
+
+#include "../events/keyPressedEvent.h"
 
 using namespace std;
 
@@ -55,6 +58,7 @@ void Game::loadLevel(int level) {
     registry->addSystem<CollisionSystem>();
     registry->addSystem<DebugColliderRectangle>();
     registry->addSystem<DamageSystem>();
+    registry->addSystem<KeyboardMovementSystem>();
 
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-left.png");
@@ -188,12 +192,15 @@ void Game::processInput() {
                 isRunning = false;
                 break;
             case SDL_KEYDOWN:
+
                 if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
                     isRunning = false;
                 }
                 if (sdlEvent.key.keysym.sym == SDLK_d) {
                     isDebugEnabled = !isDebugEnabled;
                 }
+                // trigger a keyboard event
+                eventBus->emitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
                 break;
             default:
                 break;
@@ -220,6 +227,7 @@ void Game::update() {
 
     // Perform the subscription of the events for all systems
     registry->getSystem<DamageSystem>().SubscribeToEvents(eventBus);
+    registry->getSystem<KeyboardMovementSystem>().subscribeToEvents(eventBus);
 
 
    // Update the registry to process the entities that are waiting to be create or deleted
