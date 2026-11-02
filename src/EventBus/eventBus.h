@@ -21,15 +21,17 @@ class IEventCallback {
         }
 };
 
-template<typename TEvent, typename TOwner>
+template<typename TOwner, typename TEvent>
 class EventCallback: public IEventCallback {
     private:
         typedef void(TOwner::*CallbackFunction)(TEvent&);
+
         TOwner* ownerInstance;
         CallbackFunction callbackFunction;
         virtual void call(Event& e) override {
             std::invoke(callbackFunction, ownerInstance, static_cast<TEvent&>(e));
         }
+
     public:
         EventCallback(TOwner* ownerInstance, CallbackFunction callbackFunction) {
             this->ownerInstance = ownerInstance;
@@ -42,7 +44,7 @@ typedef std::list<std::unique_ptr<IEventCallback>> HandlerList;
 
 class EventBus {
     private:
-        std::map<std::type_index, std::unique_ptr<HandlerList>> sibscribers;
+        std::map<std::type_index, std::unique_ptr<HandlerList>> subscribers;
 
     public:
         EventBus() {
@@ -52,13 +54,18 @@ class EventBus {
             Logger::Log("EventBus destructor called!");
         }
 
+        // clears the subscribers list
+        void reset() {
+            subscribers.clear();
+        }
+
         /*
         * Subscribe to an event type
         * In our implementation, a listener  subscribes to an event
         * Example: eventBus->subscribeToEvent<CollisionEvent>(this, &Game::onCollision); 
         */
        template<typename TEvent, typename TOwner>
-        void subscribeToEvent(TOwner* ownerInstance, void(TOwner::*callbackFunction)(TEvent&)) {
+        void subscribeToEvent(TOwner* ownerInstance, void (TOwner::*callbackFunction)(TEvent&)) {
             if (!subscribers[typeid(TEvent)].get()) {
                 subscribers[typeid(TEvent)] = std::make_unique<HandlerList>();
             }
