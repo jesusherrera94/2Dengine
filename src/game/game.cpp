@@ -17,6 +17,10 @@
 #include "../systems/animationSystem.h"
 #include "../systems/collisionSystem.h"
 #include "../systems/debugColliderRectangle.h"
+#include "../systems/damageSystem.h"
+#include "../systems/keyboardMovementSystem.h"
+
+#include "../events/keyPressedEvent.h"
 
 using namespace std;
 
@@ -53,6 +57,8 @@ void Game::loadLevel(int level) {
     registry->addSystem<AnimationSystem>();
     registry->addSystem<CollisionSystem>();
     registry->addSystem<DebugColliderRectangle>();
+    registry->addSystem<DamageSystem>();
+    registry->addSystem<KeyboardMovementSystem>();
 
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-left.png");
@@ -108,6 +114,7 @@ Game::Game() {
     isRunning = false;
     registry = std::make_unique<Registry>(); // intanciate a registry object
     assetStore = std::make_unique<AssetStore>();
+    eventBus = std::make_unique<EventBus>();
     Logger::Log("Game constructor called");
 }
 
@@ -185,12 +192,15 @@ void Game::processInput() {
                 isRunning = false;
                 break;
             case SDL_KEYDOWN:
+
                 if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
                     isRunning = false;
                 }
                 if (sdlEvent.key.keysym.sym == SDLK_d) {
                     isDebugEnabled = !isDebugEnabled;
                 }
+                // trigger a keyboard event
+                eventBus->emitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
                 break;
             default:
                 break;
@@ -212,6 +222,13 @@ void Game::update() {
     // store the current frame time
     millisecondsPreviousFrame = SDL_GetTicks();
 
+    // Resset all event handlers for the current frame
+    eventBus->reset();
+
+    // Perform the subscription of the events for all systems
+    registry->getSystem<DamageSystem>().SubscribeToEvents(eventBus);
+    registry->getSystem<KeyboardMovementSystem>().subscribeToEvents(eventBus);
+
 
    // Update the registry to process the entities that are waiting to be create or deleted
    registry->update();
@@ -219,7 +236,7 @@ void Game::update() {
    // Invoke all the systems that need to update
    registry->getSystem<MovementSystem>().update(deltaTime);
    registry->getSystem<AnimationSystem>().update();
-   registry->getSystem<CollisionSystem>().update();
+   registry->getSystem<CollisionSystem>().update(eventBus);
 }
 
 void Game::render() {

@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include "../ecs/ecs.h"
 #include "../assetStore/assetStore.h"
+#include "../eventBus/eventBus.h"
 
 const int FPS = 60;
 const int MILLISECONDS_PER_FRAME = 1000 / FPS;
@@ -18,6 +19,7 @@ class Game {
 
     std::unique_ptr<Registry> registry;
     std::unique_ptr<AssetStore> assetStore;
+    std::unique_ptr<EventBus> eventBus;
 
     void loadMap();
 
