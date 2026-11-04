@@ -65,7 +65,7 @@ void Game::loadLevel(int level) {
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-left.png");
     assetStore->addTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
-    assetStore->addTexture(renderer, "chopper-image", "./assets/images/chopper-spritesheed.png");
+    assetStore->addTexture(renderer, "chopper-image", "./assets/images/chopper-spritesheet.png");
     assetStore->addTexture(renderer, "radar-image", "./assets/images/radar.png");
     assetStore->addTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
 
@@ -90,12 +90,7 @@ void Game::loadLevel(int level) {
     truck.addComponent<RigidBodyComponent>(glm::vec2(10.0, 0.0));
     truck.addComponent<SpriteComponent>("truck-image", 32,32, 1);
     truck.addComponent<BoxColliderComponent>(32, 32);
-    truck.addComponent<KeyboardControlComponent>(
-            glm::vec2(0.0, -20.0),
-            glm::vec2(20.0, 0.0),
-            glm::vec2(0.0, 20.0),
-            glm::vec2(-20.0, 0.0)
-        );
+    
 
 
     Entity choppper = registry->createEntity();
@@ -103,7 +98,12 @@ void Game::loadLevel(int level) {
     choppper.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     choppper.addComponent<SpriteComponent>("chopper-image", 32,32, 1);
     choppper.addComponent<AnimationComponent>(2, 15, true);
-
+    choppper.addComponent<KeyboardControlComponent>(
+            glm::vec2(0.0, -20.0),
+            glm::vec2(20.0, 0.0),
+            glm::vec2(0.0, 20.0),
+            glm::vec2(-20.0, 0.0)
+        );
 
     Entity radar = registry->createEntity();
     radar.addComponent<TransformComponent>(glm::vec2(windowWidth - 184, 10.0), glm::vec2(1.0, 1.0), 0.0);
