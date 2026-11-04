@@ -52,6 +52,7 @@ class ProjectileEmitterSystem: public System {
                         projectileVelocity.y = projectileEmitter.projectileVelocity.y * directionY;
 
                         Entity projectile = entity.registry->createEntity();
+                        projectile.group("projectiles");
                         projectile.addComponent<TransformComponent>(projectilePosition, glm::vec2(1.0, 1.0), 0.0);
                         projectile.addComponent<RigidBodyComponent>(projectileVelocity);
                         projectile.addComponent<SpriteComponent>("bullet-image", 4, 4, 4);
@@ -84,6 +85,7 @@ class ProjectileEmitterSystem: public System {
                         projectilePosition.y += (transform.scale.y * sprite.height / 2);
                     }
                     Entity projectile = registry->createEntity();
+                    projectile.group("projectiles");
                     projectile.addComponent<TransformComponent>(projectilePosition, glm::vec2(1.0, 1.0), 0.0);
                     projectile.addComponent<RigidBodyComponent>(projectileEmitter.projectileVelocity);
                     projectile.addComponent<SpriteComponent>("bullet-image", 4, 4, 4);

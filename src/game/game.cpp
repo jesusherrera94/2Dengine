@@ -82,7 +82,7 @@ void Game::loadLevel(int level) {
     registry->addSystem<ProjectileLifeCycleSystem>();
 
     // adding assets to the store
-    assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-left.png");
+    assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
     assetStore->addTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
     assetStore->addTexture(renderer, "chopper-image", "./assets/images/chopper-spritesheet.png");
     assetStore->addTexture(renderer, "radar-image", "./assets/images/radar.png");
@@ -105,16 +105,16 @@ void Game::loadLevel(int level) {
     tank.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     tank.addComponent<SpriteComponent>("tank-image", 32,32, 2);
     tank.addComponent<BoxColliderComponent>(32, 32);
-    tank.addComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 3000, 0, false);
+    tank.addComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 3000, 10, false);
     tank.addComponent<HealthComponent>(100);
 
     Entity truck = registry->createEntity();
-    tank.group("enemies");
+    truck.group("enemies");
     truck.addComponent<TransformComponent>(glm::vec2(390.0, 250.0), glm::vec2(1.0, 1.0), 0.0);
     truck.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     truck.addComponent<SpriteComponent>("truck-image", 32,32, 1);
     truck.addComponent<BoxColliderComponent>(32, 32);
-    truck.addComponent<ProjectileEmitterComponent>(glm::vec2(0.0, 100.0), 2000, 5000, 0, false);
+    truck.addComponent<ProjectileEmitterComponent>(glm::vec2(0.0, 100.0), 2000, 5000, 10, false);
     truck.addComponent<HealthComponent>(100);
     
 
@@ -125,6 +125,7 @@ void Game::loadLevel(int level) {
     choppper.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     choppper.addComponent<SpriteComponent>("chopper-image", 32,32, 1);
     choppper.addComponent<AnimationComponent>(2, 15, true);
+    choppper.addComponent<BoxColliderComponent>(32, 32);
     choppper.addComponent<KeyboardControlComponent>(
             glm::vec2(0.0, -80.0),
             glm::vec2(80.0, 0.0),
@@ -137,7 +138,7 @@ void Game::loadLevel(int level) {
         glm::vec2(150.0, 150.0),
         0, // don't repeat only when space is pressed
         10000,
-        0,
+        10,
         true
     );
 
