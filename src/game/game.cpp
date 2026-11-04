@@ -15,6 +15,7 @@
 #include "../components/keyboardControlComponent.h"
 #include "../components/cameraFollowComponent.h"
 #include "../components/projectileEmitterComponent.h"
+#include "../components/healthComponent.h"
 
 #include "../systems/movementSystem.h"
 #include "../systems/renderSystem.h"
@@ -25,6 +26,7 @@
 #include "../systems/keyboardMovementSystem.h"
 #include "../systems/cameraMovementSystem.h"
 #include "../systems/projectileEmitterSystem.h"
+#include "../systems/projectileLifecycleSystem.h"
 
 #include "../events/keyPressedEvent.h"
 
@@ -76,6 +78,7 @@ void Game::loadLevel(int level) {
     registry->addSystem<KeyboardMovementSystem>();
     registry->addSystem<CameraMovementSystem>();
     registry->addSystem<ProjectileEmitterSystem>();
+    registry->addSystem<ProjectileLifeCycleSystem>();
 
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-left.png");
@@ -100,14 +103,16 @@ void Game::loadLevel(int level) {
     tank.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     tank.addComponent<SpriteComponent>("tank-image", 32,32, 2);
     tank.addComponent<BoxColliderComponent>(32, 32);
-    tank.addComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 10000, 0, false);
+    tank.addComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 3000, 0, false);
+    tank.addComponent<HealthComponent>(100);
 
     Entity truck = registry->createEntity();
     truck.addComponent<TransformComponent>(glm::vec2(390.0, 250.0), glm::vec2(1.0, 1.0), 0.0);
     truck.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     truck.addComponent<SpriteComponent>("truck-image", 32,32, 1);
     truck.addComponent<BoxColliderComponent>(32, 32);
-    truck.addComponent<ProjectileEmitterComponent>(glm::vec2(0.0, 100.0), 2000, 10000, 0, false);
+    truck.addComponent<ProjectileEmitterComponent>(glm::vec2(0.0, 100.0), 2000, 5000, 0, false);
+    truck.addComponent<HealthComponent>(100);
     
 
 
@@ -123,6 +128,7 @@ void Game::loadLevel(int level) {
             glm::vec2(-80.0, 0.0)
         );
     choppper.addComponent<CameraFollowComponent>();
+    choppper.addComponent<HealthComponent>(100);
 
     Entity radar = registry->createEntity();
     radar.addComponent<TransformComponent>(glm::vec2(windowWidth - 184, 10.0), glm::vec2(1.0, 1.0), 0.0);
@@ -272,6 +278,7 @@ void Game::update() {
    registry->getSystem<CollisionSystem>().update(eventBus);
    registry->getSystem<ProjectileEmitterSystem>().update(registry);
    registry->getSystem<CameraMovementSystem>().update(camera);
+   registry->getSystem<ProjectileLifeCycleSystem>().update();
 }
 
 void Game::render() {

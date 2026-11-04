@@ -9,6 +9,7 @@
 #include "../components/rigidBodyComponent.h"
 #include "../components/spriteComponent.h"
 #include "../components/boxColliderComponent.h"
+#include "../components/projectileComponent.h"
 
 
 class ProjectileEmitterSystem: public System {
@@ -34,6 +35,11 @@ class ProjectileEmitterSystem: public System {
                     projectile.addComponent<RigidBodyComponent>(projectileEmitter.projectileVelocity);
                     projectile.addComponent<SpriteComponent>("bullet-image", 4, 4, 4);
                     projectile.addComponent<BoxColliderComponent>(4, 4);
+                    projectile.addComponent<ProjectComponent>(
+                        projectileEmitter.isFriendly,
+                        projectileEmitter.hitPercentageDamage,
+                        projectileEmitter.projectileDuration
+                    );
                     projectileEmitter.lastEmissionTime = SDL_GetTicks();
                 }
             }
