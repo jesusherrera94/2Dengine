@@ -3,13 +3,13 @@
 
 #include <SDL2/SDL.h>
 
-struct ProjectComponent {
+struct ProjectileComponent {
     bool isFriendly;
     int hitPercentDamage;
     int duration;
     int startTime;
 
-    ProjectComponent(
+    ProjectileComponent(
         bool isFriendly = false,
         int hitPercentDamage = 0,
         int duration = 0

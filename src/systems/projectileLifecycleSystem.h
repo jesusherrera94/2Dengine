@@ -9,12 +9,12 @@
 class ProjectileLifeCycleSystem: public System {
     public:
         ProjectileLifeCycleSystem() {
-            requiredComponent<ProjectComponent>();
+            requiredComponent<ProjectileComponent>();
         }
 
         void update() {
             for(auto entity: getSystemEntities()) {
-                auto projectileComponent = entity.getComponent<ProjectComponent>();
+                auto projectileComponent = entity.getComponent<ProjectileComponent>();
                 if (SDL_GetTicks() - projectileComponent.startTime > projectileComponent.duration) {
                     entity.kill();
                 }

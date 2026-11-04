@@ -129,6 +129,13 @@ void Game::loadLevel(int level) {
         );
     choppper.addComponent<CameraFollowComponent>();
     choppper.addComponent<HealthComponent>(100);
+    choppper.addComponent<ProjectileEmitterComponent>(
+        glm::vec2(150.0, 150.0),
+        0, // don't repeat only when space is pressed
+        10000,
+        0,
+        true
+    );
 
     Entity radar = registry->createEntity();
     radar.addComponent<TransformComponent>(glm::vec2(windowWidth - 184, 10.0), glm::vec2(1.0, 1.0), 0.0);
@@ -267,6 +274,7 @@ void Game::update() {
     // Perform the subscription of the events for all systems
     registry->getSystem<DamageSystem>().SubscribeToEvents(eventBus);
     registry->getSystem<KeyboardMovementSystem>().subscribeToEvents(eventBus);
+    registry->getSystem<ProjectileEmitterSystem>().subscribeToEvents(eventBus);
 
 
    // Update the registry to process the entities that are waiting to be create or deleted
