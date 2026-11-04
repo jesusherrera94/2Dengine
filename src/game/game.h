@@ -16,6 +16,7 @@ class Game {
     SDL_Renderer* renderer;
     Uint32 millisecondsPreviousFrame = 0;
     bool isDebugEnabled = false;
+    SDL_Rect camera;
 
     std::unique_ptr<Registry> registry;
     std::unique_ptr<AssetStore> assetStore;
@@ -24,8 +25,11 @@ class Game {
     void loadMap();
 
     public:
-        int windowWidth;
-        int windowHeight;
+        static int windowWidth;
+        static int windowHeight;
+        static int mapWidth;
+        static int mapHeight;
+        
         void setup();
         Game();
         ~Game();

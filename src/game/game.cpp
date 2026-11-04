@@ -12,6 +12,11 @@
 #include "../components/spriteComponent.h"
 #include "../components/animationComponent.h"
 #include "../components/boxColliderComponent.h"
+#include "../components/keyboardControlComponent.h"
+#include "../components/cameraFollowComponent.h"
+#include "../components/projectileEmitterComponent.h"
+#include "../components/healthComponent.h"
+
 #include "../systems/movementSystem.h"
 #include "../systems/renderSystem.h"
 #include "../systems/animationSystem.h"
@@ -19,16 +24,24 @@
 #include "../systems/debugColliderRectangle.h"
 #include "../systems/damageSystem.h"
 #include "../systems/keyboardMovementSystem.h"
+#include "../systems/cameraMovementSystem.h"
+#include "../systems/projectileEmitterSystem.h"
+#include "../systems/projectileLifecycleSystem.h"
 
 #include "../events/keyPressedEvent.h"
 
 using namespace std;
 
+int Game::windowWidth;
+int Game::windowHeight;
+int Game::mapWidth;
+int Game::mapHeight;
+
 void Game::loadMap() {
     int tileSize = 32;
     double tileScale = 2.0;
-    int mapNumCols = 25;
-    int mapNumRows = 20;
+    int mapNumCols = 29;
+    int mapNumRows = 30;
     std::fstream mapFile;
     mapFile.open("./assets/tilemaps/jungle.map");
 
@@ -43,10 +56,14 @@ void Game::loadMap() {
 
             Entity tile = registry->createEntity();
             tile.addComponent<TransformComponent>(glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)), glm::vec2(tileScale, tileScale), 0.0);
-            tile.addComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, srcRectX, srcRectY);
+            tile.addComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, false, srcRectX, srcRectY);
         }
     }
     mapFile.close();
+
+    mapWidth = mapNumCols * tileSize * tileScale;
+    mapHeight = mapNumRows * tileSize * tileScale;
+
 }
 
 
@@ -59,13 +76,17 @@ void Game::loadLevel(int level) {
     registry->addSystem<DebugColliderRectangle>();
     registry->addSystem<DamageSystem>();
     registry->addSystem<KeyboardMovementSystem>();
+    registry->addSystem<CameraMovementSystem>();
+    registry->addSystem<ProjectileEmitterSystem>();
+    registry->addSystem<ProjectileLifeCycleSystem>();
 
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-left.png");
     assetStore->addTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
-    assetStore->addTexture(renderer, "chopper-image", "./assets/images/chopper.png");
+    assetStore->addTexture(renderer, "chopper-image", "./assets/images/chopper-spritesheet.png");
     assetStore->addTexture(renderer, "radar-image", "./assets/images/radar.png");
     assetStore->addTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
+    assetStore->addTexture(renderer, "bullet-image", "./assets/images/bullet.png");
 
 
     // load the tile map
@@ -79,27 +100,47 @@ void Game::loadLevel(int level) {
     // registry->addComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
     // registry->addComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
     tank.addComponent<TransformComponent>(glm::vec2(500.0, 250.0), glm::vec2(1.0, 1.0), 0.0);
-    tank.addComponent<RigidBodyComponent>(glm::vec2(-20.0, 0.0));
+    tank.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     tank.addComponent<SpriteComponent>("tank-image", 32,32, 2);
     tank.addComponent<BoxColliderComponent>(32, 32);
+    tank.addComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 3000, 0, false);
+    tank.addComponent<HealthComponent>(100);
 
     Entity truck = registry->createEntity();
     truck.addComponent<TransformComponent>(glm::vec2(390.0, 250.0), glm::vec2(1.0, 1.0), 0.0);
-    truck.addComponent<RigidBodyComponent>(glm::vec2(10.0, 0.0));
+    truck.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     truck.addComponent<SpriteComponent>("truck-image", 32,32, 1);
     truck.addComponent<BoxColliderComponent>(32, 32);
+    truck.addComponent<ProjectileEmitterComponent>(glm::vec2(0.0, 100.0), 2000, 5000, 0, false);
+    truck.addComponent<HealthComponent>(100);
+    
+
 
     Entity choppper = registry->createEntity();
     choppper.addComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
     choppper.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     choppper.addComponent<SpriteComponent>("chopper-image", 32,32, 1);
     choppper.addComponent<AnimationComponent>(2, 15, true);
-
+    choppper.addComponent<KeyboardControlComponent>(
+            glm::vec2(0.0, -80.0),
+            glm::vec2(80.0, 0.0),
+            glm::vec2(0.0, 80.0),
+            glm::vec2(-80.0, 0.0)
+        );
+    choppper.addComponent<CameraFollowComponent>();
+    choppper.addComponent<HealthComponent>(100);
+    choppper.addComponent<ProjectileEmitterComponent>(
+        glm::vec2(150.0, 150.0),
+        0, // don't repeat only when space is pressed
+        10000,
+        0,
+        true
+    );
 
     Entity radar = registry->createEntity();
     radar.addComponent<TransformComponent>(glm::vec2(windowWidth - 184, 10.0), glm::vec2(1.0, 1.0), 0.0);
     radar.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
-    radar.addComponent<SpriteComponent>("radar-image", 64, 64, 2);
+    radar.addComponent<SpriteComponent>("radar-image", 64, 64, 2, true);
     radar.addComponent<AnimationComponent>(8, 5, false);
 
 }
@@ -166,6 +207,11 @@ void Game::initialize() {
     // real fullscreen
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
+    camera.x = 0;
+    camera.y = 0;
+    camera.w = windowWidth;
+    camera.h = windowHeight;
+
     isRunning = true;
 }
 
@@ -228,6 +274,7 @@ void Game::update() {
     // Perform the subscription of the events for all systems
     registry->getSystem<DamageSystem>().SubscribeToEvents(eventBus);
     registry->getSystem<KeyboardMovementSystem>().subscribeToEvents(eventBus);
+    registry->getSystem<ProjectileEmitterSystem>().subscribeToEvents(eventBus);
 
 
    // Update the registry to process the entities that are waiting to be create or deleted
@@ -237,6 +284,9 @@ void Game::update() {
    registry->getSystem<MovementSystem>().update(deltaTime);
    registry->getSystem<AnimationSystem>().update();
    registry->getSystem<CollisionSystem>().update(eventBus);
+   registry->getSystem<ProjectileEmitterSystem>().update(registry);
+   registry->getSystem<CameraMovementSystem>().update(camera);
+   registry->getSystem<ProjectileLifeCycleSystem>().update();
 }
 
 void Game::render() {
@@ -244,8 +294,8 @@ void Game::render() {
     SDL_RenderClear(renderer);
 
    // Invoke all the system that need to render
-   registry->getSystem<RenderSystem>().update(renderer, assetStore);
-   registry->getSystem<DebugColliderRectangle>().update(renderer, isDebugEnabled);
+   registry->getSystem<RenderSystem>().update(renderer, assetStore, camera);
+   registry->getSystem<DebugColliderRectangle>().update(renderer, isDebugEnabled, camera);
 
     SDL_RenderPresent(renderer);
 }
