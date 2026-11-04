@@ -55,6 +55,7 @@ void Game::loadMap() {
             mapFile.ignore();
 
             Entity tile = registry->createEntity();
+            tile.group("tile");
             tile.addComponent<TransformComponent>(glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)), glm::vec2(tileScale, tileScale), 0.0);
             tile.addComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, false, srcRectX, srcRectY);
         }
@@ -95,6 +96,7 @@ void Game::loadLevel(int level) {
 
     // Create some entity
     Entity tank = registry->createEntity();
+    tank.group("enemies");
     
     // add some components
     // registry->addComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
@@ -107,6 +109,7 @@ void Game::loadLevel(int level) {
     tank.addComponent<HealthComponent>(100);
 
     Entity truck = registry->createEntity();
+    tank.group("enemies");
     truck.addComponent<TransformComponent>(glm::vec2(390.0, 250.0), glm::vec2(1.0, 1.0), 0.0);
     truck.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     truck.addComponent<SpriteComponent>("truck-image", 32,32, 1);
@@ -117,6 +120,7 @@ void Game::loadLevel(int level) {
 
 
     Entity choppper = registry->createEntity();
+    choppper.tag("player");
     choppper.addComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
     choppper.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     choppper.addComponent<SpriteComponent>("chopper-image", 32,32, 1);
