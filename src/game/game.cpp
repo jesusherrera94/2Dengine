@@ -52,7 +52,7 @@ void Game::loadMap() {
 
             Entity tile = registry->createEntity();
             tile.addComponent<TransformComponent>(glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)), glm::vec2(tileScale, tileScale), 0.0);
-            tile.addComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, srcRectX, srcRectY);
+            tile.addComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, false, srcRectX, srcRectY);
         }
     }
     mapFile.close();
@@ -121,7 +121,7 @@ void Game::loadLevel(int level) {
     Entity radar = registry->createEntity();
     radar.addComponent<TransformComponent>(glm::vec2(windowWidth - 184, 10.0), glm::vec2(1.0, 1.0), 0.0);
     radar.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
-    radar.addComponent<SpriteComponent>("radar-image", 64, 64, 2);
+    radar.addComponent<SpriteComponent>("radar-image", 64, 64, 2, true);
     radar.addComponent<AnimationComponent>(8, 5, false);
 
 }
