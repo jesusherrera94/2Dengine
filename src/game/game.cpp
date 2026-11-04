@@ -273,7 +273,7 @@ void Game::render() {
 
    // Invoke all the system that need to render
    registry->getSystem<RenderSystem>().update(renderer, assetStore, camera);
-   registry->getSystem<DebugColliderRectangle>().update(renderer, isDebugEnabled);
+   registry->getSystem<DebugColliderRectangle>().update(renderer, isDebugEnabled, camera);
 
     SDL_RenderPresent(renderer);
 }
