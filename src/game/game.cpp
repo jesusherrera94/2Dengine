@@ -36,8 +36,8 @@ int Game::mapHeight;
 void Game::loadMap() {
     int tileSize = 32;
     double tileScale = 2.0;
-    int mapNumCols = 25;
-    int mapNumRows = 20;
+    int mapNumCols = 29;
+    int mapNumRows = 30;
     std::fstream mapFile;
     mapFile.open("./assets/tilemaps/jungle.map");
 
@@ -55,10 +55,11 @@ void Game::loadMap() {
             tile.addComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, srcRectX, srcRectY);
         }
     }
+    mapFile.close();
+
     mapWidth = mapNumCols * tileSize * tileScale;
     mapHeight = mapNumRows * tileSize * tileScale;
-    
-    mapFile.close();
+
 }
 
 
@@ -190,7 +191,7 @@ void Game::initialize() {
     camera.x = 0;
     camera.y = 0;
     camera.w = windowWidth;
-    camera.y = windowHeight;
+    camera.h = windowHeight;
 
     isRunning = true;
 }
