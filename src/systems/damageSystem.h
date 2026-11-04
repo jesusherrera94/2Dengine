@@ -20,8 +20,8 @@ class DamageSystem: public System {
 
         void onCollision(CollisionEvent& event) {
             Logger::Log("The damage system recieved an event collision between entities " + std::to_string(event.a.getId()) + " and " + std::to_string(event.b.getId()));
-            event.a.kill();
-            event.b.kill();
+            // event.a.kill();
+            // event.b.kill();
         }
 
         void update() {
