@@ -13,6 +13,7 @@
 #include "../components/animationComponent.h"
 #include "../components/boxColliderComponent.h"
 #include "../components/keyboardControlComponent.h"
+#include "../components/cameraFollowComponent.h"
 
 #include "../systems/movementSystem.h"
 #include "../systems/renderSystem.h"
@@ -21,10 +22,16 @@
 #include "../systems/debugColliderRectangle.h"
 #include "../systems/damageSystem.h"
 #include "../systems/keyboardMovementSystem.h"
+#include "../systems/cameraMovementSystem.h"
 
 #include "../events/keyPressedEvent.h"
 
 using namespace std;
+
+int Game::windowWidth;
+int Game::windowHeight;
+int Game::mapWidth;
+int Game::mapHeight;
 
 void Game::loadMap() {
     int tileSize = 32;
@@ -48,6 +55,9 @@ void Game::loadMap() {
             tile.addComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, srcRectX, srcRectY);
         }
     }
+    mapWidth = mapNumCols * tileSize * tileScale;
+    mapHeight = mapNumRows * tileSize * tileScale;
+    
     mapFile.close();
 }
 
@@ -61,6 +71,7 @@ void Game::loadLevel(int level) {
     registry->addSystem<DebugColliderRectangle>();
     registry->addSystem<DamageSystem>();
     registry->addSystem<KeyboardMovementSystem>();
+    registry->addSystem<CameraMovementSystem>();
 
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-left.png");
@@ -99,11 +110,12 @@ void Game::loadLevel(int level) {
     choppper.addComponent<SpriteComponent>("chopper-image", 32,32, 1);
     choppper.addComponent<AnimationComponent>(2, 15, true);
     choppper.addComponent<KeyboardControlComponent>(
-            glm::vec2(0.0, -20.0),
-            glm::vec2(20.0, 0.0),
-            glm::vec2(0.0, 20.0),
-            glm::vec2(-20.0, 0.0)
+            glm::vec2(0.0, -80.0),
+            glm::vec2(80.0, 0.0),
+            glm::vec2(0.0, 80.0),
+            glm::vec2(-80.0, 0.0)
         );
+    choppper.addComponent<CameraFollowComponent>();
 
     Entity radar = registry->createEntity();
     radar.addComponent<TransformComponent>(glm::vec2(windowWidth - 184, 10.0), glm::vec2(1.0, 1.0), 0.0);
@@ -174,6 +186,11 @@ void Game::initialize() {
 
     // real fullscreen
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+
+    camera.x = 0;
+    camera.y = 0;
+    camera.w = windowWidth;
+    camera.y = windowHeight;
 
     isRunning = true;
 }
@@ -246,6 +263,7 @@ void Game::update() {
    registry->getSystem<MovementSystem>().update(deltaTime);
    registry->getSystem<AnimationSystem>().update();
    registry->getSystem<CollisionSystem>().update(eventBus);
+   registry->getSystem<CameraMovementSystem>().update(camera);
 }
 
 void Game::render() {
@@ -253,7 +271,7 @@ void Game::render() {
     SDL_RenderClear(renderer);
 
    // Invoke all the system that need to render
-   registry->getSystem<RenderSystem>().update(renderer, assetStore);
+   registry->getSystem<RenderSystem>().update(renderer, assetStore, camera);
    registry->getSystem<DebugColliderRectangle>().update(renderer, isDebugEnabled);
 
     SDL_RenderPresent(renderer);
