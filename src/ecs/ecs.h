@@ -102,6 +102,10 @@ class IPool {
  class Pool: public IPool{
     private:
         std::vector<T> data;
+        int size;
+        std::unordered_map<int, int> entityIdToIndex;
+        std::unordered_map<int, int> indexToEntityId;
+
     public:
         Pool(int size=100){
             data.resize(size);
@@ -122,9 +126,31 @@ class IPool {
         void add(T object) {
             data.push_back(object);
         }
-        void set(int index, T object) {
+        void set(int entityId, T object) {
+            int index = size;
+            entityIdToIndex.emplace(entityId, index);
+            indexToEntityId.emplace(index, entityId);
             data[index] = object;
+            size++;
         }
+        
+        void remove(int entityId) {
+            // copy the last element to the deleted position to keep the array packed
+            int indexOfRemoved = entityIdToIndex[entityId];
+            int indexOfLast = seize - 1;
+            data[indexOfRemoved] = data[indexOfLast];
+
+            // update the index-entity maps to point to the correct elements
+            int entityIdOfLastElement = indexToEntityId[indexOfLast];
+            entityIdToIndex[entityIdOfLastElement] = indexOfRemoved;
+            indexToEntityId[indexOfRemoved] = entityIdOfLastElement;
+
+            entityIdToIndex.erase(entityId);
+            indexToEntityId.erase(indexOfLast);
+
+            size--;
+        }
+
         T& get(int index) {
             return static_cast<T&>(data[index]);
         }
