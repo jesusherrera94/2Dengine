@@ -86,6 +86,14 @@ void Registry::update() {
     for (auto entity: entitiesToBeRemoved) {
         removeEntitiesFromSystems(entity);
         entityComponentSignatures[entity.getId()].reset();
+
+        // remove the entity from the component pools
+        for (auto pool : componentPools) {
+            if (pool) {
+                pool->removeEntityFromPool(entity.getId());
+            }
+        }
+
         // make the entity id available to reuse
         freeIds.push_back(entity.getId());
 

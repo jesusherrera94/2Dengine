@@ -92,7 +92,8 @@ class System {
 
 class IPool {
     public:
-        virtual ~IPool(){}
+        virtual ~IPool() = default;
+        virtual void removeEntityFromPool(int entityId) = 0;
 };
 
 /**
@@ -107,37 +108,52 @@ class IPool {
         std::unordered_map<int, int> indexToEntityId;
 
     public:
-        Pool(int size=100){
-            data.resize(size);
+        Pool(int capacity=100){
+            size = 0;
+            data.resize(capacity);
         }
         virtual ~Pool() = default;
+
         bool isEmpty() const {
-            return data.empty();
+            return size == 0;
         }
+
         int getSize() const {
-            return data.size();
+            return size;
         }
         void resize(int n) {
             data.resize(n);
         }
         void clear() {
             data.clear();
+            size = 0;
         }
+
         void add(T object) {
             data.push_back(object);
         }
+
         void set(int entityId, T object) {
-            int index = size;
-            entityIdToIndex.emplace(entityId, index);
-            indexToEntityId.emplace(index, entityId);
-            data[index] = object;
-            size++;
+            if (entityIdToIndex.find(entityId) != entityIdToIndex.end()) {
+                // if the element already exists, simply replace the component object
+                int index = entityIdToIndex[entityId];
+                data[index] = object;
+            } else {
+                int index = size;
+                entityIdToIndex.emplace(entityId, index);
+                indexToEntityId.emplace(index, entityId);
+                if (index >= data.capacity()) {
+                    data.resize(size * 2);
+                }
+                data[index] = object;
+                size++;
+            }
         }
         
         void remove(int entityId) {
             // copy the last element to the deleted position to keep the array packed
             int indexOfRemoved = entityIdToIndex[entityId];
-            int indexOfLast = seize - 1;
+            int indexOfLast = size - 1;
             data[indexOfRemoved] = data[indexOfLast];
 
             // update the index-entity maps to point to the correct elements
@@ -151,9 +167,17 @@ class IPool {
             size--;
         }
 
-        T& get(int index) {
+        void removeEntityFromPool(int entityId) override {
+            if (entityIdToIndex.find(entityId) != entityIdToIndex.end()) {
+                remove(entityId);
+            }
+        }
+
+        T& get(int entityId) {
+            int index = entityIdToIndex[entityId];
             return static_cast<T&>(data[index]);
         }
+
         T& operator [] (unsigned int index) {
             return data[index];
         }
@@ -247,15 +271,11 @@ void Registry::addComponent(Entity entity, TArgs&& ...args) {
     }
 
     if (!componentPools[componentId]) {
-        std::shared_ptr<Pool<TComponent>> newComponentPool = std::make_shared<Pool<TComponent>>();
+        std::shared_ptr<Pool<TComponent>> newComponentPool(new Pool<TComponent>());
         componentPools[componentId] = newComponentPool;
     }
     // get the pool of component values for that component type
     std::shared_ptr<Pool<TComponent>> componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
-
-    if(entityId >= componentPool->getSize()) {
-        componentPool->resize(numEntities);
-    }
 
     TComponent newComponent(std::forward<TArgs>(args)...);
     componentPool->set(entityId, newComponent);
@@ -267,7 +287,12 @@ template <typename TComponent>
 void Registry::removeComponent(Entity entity) {
     const auto componentId = Component<TComponent>::getId();
     const auto entityId = entity.getId();
+
+    std::shared_ptr<Pool<TComponent>> componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
+    componentPool->remove(entityId);
+
     entityComponentSignatures[entityId].set(componentId, false);
+
     Logger::Log("Component id = " + std::to_string(componentId) + " was removed from entity id: " + std::to_string(entityId));
 
 }
