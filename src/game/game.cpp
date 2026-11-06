@@ -29,6 +29,7 @@
 #include "../systems/projectileEmitterSystem.h"
 #include "../systems/projectileLifecycleSystem.h"
 #include "../systems/renderTextSystem.h"
+#include "../systems/renderHealthBarSystem.h"
 
 #include "../events/keyPressedEvent.h"
 
@@ -83,6 +84,7 @@ void Game::loadLevel(int level) {
     registry->addSystem<ProjectileEmitterSystem>();
     registry->addSystem<ProjectileLifeCycleSystem>();
     registry->addSystem<RenderTextSystem>();
+    registry->addSystem<RenderHealthBarSystem>();
 
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -92,6 +94,8 @@ void Game::loadLevel(int level) {
     assetStore->addTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
     assetStore->addTexture(renderer, "bullet-image", "./assets/images/bullet.png");
     assetStore->addFont("charriot-font", "./assets/fonts/charriot.ttf", 28);
+    assetStore->addFont("pico8-font-5", "./assets/fonts/pico8.ttf", 5);
+    assetStore->addFont("pico8-font-10", "./assets/fonts/pico8.ttf", 10);
 
 
     // load the tile map
@@ -314,6 +318,7 @@ void Game::render() {
    registry->getSystem<RenderSystem>().update(renderer, assetStore, camera);
    registry->getSystem<DebugColliderRectangle>().update(renderer, isDebugEnabled, camera);
    registry->getSystem<RenderTextSystem>().update(renderer, assetStore, camera);
+   registry->getSystem<RenderHealthBarSystem>().update(renderer, assetStore, camera);
 
     SDL_RenderPresent(renderer);
 }

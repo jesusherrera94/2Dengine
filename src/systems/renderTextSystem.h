@@ -38,6 +38,7 @@ class RenderTextSystem: public System {
                 };
 
                 SDL_RenderCopy(renderer, texture, NULL, &distRect);
+                SDL_DestroyTexture(texture);
             }
         }
 };
