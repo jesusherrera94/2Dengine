@@ -11,9 +11,9 @@
 class RenderHealthBarSystem: public System {
     public:
         RenderHealthBarSystem() {
-            requiredComponent<HealthComponent>();
             requiredComponent<TransformComponent>();
             requiredComponent<SpriteComponent>();
+            requiredComponent<HealthComponent>();
         }
 
         void update(SDL_Renderer* renderer, const std::unique_ptr<AssetStore>& assetStore, const SDL_Rect& camera) {
@@ -44,8 +44,8 @@ class RenderHealthBarSystem: public System {
                 SDL_Rect healthBarRectangle = {
                     static_cast<int>(healthBarPosX),
                     static_cast<int>(healthBarPosY),
-                    //static_cast<int>(healthBarWidth * (health.healthPercentage / 100)),
-                    static_cast<int>(healthBarWidth),
+                    static_cast<int>(healthBarWidth * (health.healthPercentage / 100.0)),
+                    // static_cast<int>(healthBarWidth),
                     static_cast<int>(healthBarHeight),
                 };
 
