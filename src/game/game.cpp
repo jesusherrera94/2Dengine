@@ -91,7 +91,7 @@ void Game::loadLevel(int level) {
     assetStore->addTexture(renderer, "radar-image", "./assets/images/radar.png");
     assetStore->addTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
     assetStore->addTexture(renderer, "bullet-image", "./assets/images/bullet.png");
-    assetStore->addFont("charriot-font", "./assets/fonts/charriot.ttf", 14);
+    assetStore->addFont("charriot-font", "./assets/fonts/charriot.ttf", 28);
 
 
     // load the tile map
@@ -152,9 +152,9 @@ void Game::loadLevel(int level) {
     radar.addComponent<SpriteComponent>("radar-image", 64, 64, 2, true);
     radar.addComponent<AnimationComponent>(8, 5, false);
 
-    Entity label = registry->createEntity();
-    SDL_Color white = {255,255,255};
-    label.addComponent<TextLabelComponent>(glm::vec2(100, 100), "Hello world!", "charriot-font", white, true);
+    Entity title = registry->createEntity();
+    SDL_Color greenColor = {0,255,0};
+    title.addComponent<TextLabelComponent>(glm::vec2((windowWidth / 2) - 120, 45), "Chopper Game 1.0", "charriot-font", greenColor, true);
 
 }
 
