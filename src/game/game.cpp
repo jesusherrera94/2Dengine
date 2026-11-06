@@ -16,6 +16,7 @@
 #include "../components/cameraFollowComponent.h"
 #include "../components/projectileEmitterComponent.h"
 #include "../components/healthComponent.h"
+#include "../components/textLabelComponent.h"
 
 #include "../systems/movementSystem.h"
 #include "../systems/renderSystem.h"
@@ -27,6 +28,7 @@
 #include "../systems/cameraMovementSystem.h"
 #include "../systems/projectileEmitterSystem.h"
 #include "../systems/projectileLifecycleSystem.h"
+#include "../systems/renderTextSystem.h"
 
 #include "../events/keyPressedEvent.h"
 
@@ -80,6 +82,7 @@ void Game::loadLevel(int level) {
     registry->addSystem<CameraMovementSystem>();
     registry->addSystem<ProjectileEmitterSystem>();
     registry->addSystem<ProjectileLifeCycleSystem>();
+    registry->addSystem<RenderTextSystem>();
 
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -88,6 +91,7 @@ void Game::loadLevel(int level) {
     assetStore->addTexture(renderer, "radar-image", "./assets/images/radar.png");
     assetStore->addTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
     assetStore->addTexture(renderer, "bullet-image", "./assets/images/bullet.png");
+    assetStore->addFont("carriot-font", "./assets/fonts/charriot.ttf", 14);
 
 
     // load the tile map
@@ -147,6 +151,10 @@ void Game::loadLevel(int level) {
     radar.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     radar.addComponent<SpriteComponent>("radar-image", 64, 64, 2, true);
     radar.addComponent<AnimationComponent>(8, 5, false);
+
+    Entity label = registry->createEntity();
+    SDL_Color white = {255,255,255};
+    label.addComponent<TextLabelComponent>(glm::vec2(100, 100), "Hello world!", "carriot-font", white, true);
 
 }
 
@@ -301,6 +309,7 @@ void Game::render() {
    // Invoke all the system that need to render
    registry->getSystem<RenderSystem>().update(renderer, assetStore, camera);
    registry->getSystem<DebugColliderRectangle>().update(renderer, isDebugEnabled, camera);
+   registry->getSystem<RenderTextSystem>().update(renderer, assetStore, camera);
 
     SDL_RenderPresent(renderer);
 }
