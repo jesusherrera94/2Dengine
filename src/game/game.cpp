@@ -16,6 +16,7 @@
 #include "../components/cameraFollowComponent.h"
 #include "../components/projectileEmitterComponent.h"
 #include "../components/healthComponent.h"
+#include "../components/textLabelComponent.h"
 
 #include "../systems/movementSystem.h"
 #include "../systems/renderSystem.h"
@@ -27,6 +28,8 @@
 #include "../systems/cameraMovementSystem.h"
 #include "../systems/projectileEmitterSystem.h"
 #include "../systems/projectileLifecycleSystem.h"
+#include "../systems/renderTextSystem.h"
+#include "../systems/renderHealthBarSystem.h"
 
 #include "../events/keyPressedEvent.h"
 
@@ -80,6 +83,8 @@ void Game::loadLevel(int level) {
     registry->addSystem<CameraMovementSystem>();
     registry->addSystem<ProjectileEmitterSystem>();
     registry->addSystem<ProjectileLifeCycleSystem>();
+    registry->addSystem<RenderTextSystem>();
+    registry->addSystem<RenderHealthBarSystem>();
 
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -88,6 +93,9 @@ void Game::loadLevel(int level) {
     assetStore->addTexture(renderer, "radar-image", "./assets/images/radar.png");
     assetStore->addTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
     assetStore->addTexture(renderer, "bullet-image", "./assets/images/bullet.png");
+    assetStore->addFont("charriot-font", "./assets/fonts/charriot.ttf", 28);
+    assetStore->addFont("pico8-font-5", "./assets/fonts/pico8.ttf", 5);
+    assetStore->addFont("pico8-font-10", "./assets/fonts/pico8.ttf", 10);
 
 
     // load the tile map
@@ -148,6 +156,10 @@ void Game::loadLevel(int level) {
     radar.addComponent<SpriteComponent>("radar-image", 64, 64, 2, true);
     radar.addComponent<AnimationComponent>(8, 5, false);
 
+    Entity title = registry->createEntity();
+    SDL_Color greenColor = {0,255,0};
+    title.addComponent<TextLabelComponent>(glm::vec2((windowWidth / 2) - 120, 45), "Chopper Game 1.0", "charriot-font", greenColor, true);
+
 }
 
 
@@ -174,6 +186,10 @@ void Game::initialize() {
         Logger::Err("Error: failed to initialize SDL: " + std::string(SDL_GetError()));
         return;
     };
+    if (TTF_Init() != 0){
+        Logger::Err("Error: failed to initialize TTF: " + std::string(SDL_GetError()));
+        return;
+    }
     // Getting the current display mode to set the window size to the display size
     // Fake fullscreen
     SDL_DisplayMode displayMode;
@@ -301,6 +317,8 @@ void Game::render() {
    // Invoke all the system that need to render
    registry->getSystem<RenderSystem>().update(renderer, assetStore, camera);
    registry->getSystem<DebugColliderRectangle>().update(renderer, isDebugEnabled, camera);
+   registry->getSystem<RenderTextSystem>().update(renderer, assetStore, camera);
+   registry->getSystem<RenderHealthBarSystem>().update(renderer, assetStore, camera);
 
     SDL_RenderPresent(renderer);
 }
