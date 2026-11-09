@@ -54,7 +54,7 @@ class MovementSystem: public System {
             // TODO: Implement movement logic here
             for (auto entity : getSystemEntities()) {
                 TransformComponent& transform = entity.getComponent<TransformComponent>();
-                const RigidBodyComponent rigidBodyComponent = entity.getComponent<RigidBodyComponent>();
+                RigidBodyComponent& rigidBodyComponent = entity.getComponent<RigidBodyComponent>();
 
                 transform.position.x += rigidBodyComponent.velocity.x * deltaTime;
                 transform.position.y += rigidBodyComponent.velocity.y * deltaTime;
@@ -64,6 +64,10 @@ class MovementSystem: public System {
                     transform.position.y < 0 ||
                     transform.position.y > Game::mapHeight
                     );
+                if (isEntityOutsideMap && entity.hasTag("player")) {
+                    rigidBodyComponent.velocity.x = 0;
+                    rigidBodyComponent.velocity.y = 0;
+                }
                 // kill all the entities that move outside the map boundaries
                 if (isEntityOutsideMap && !entity.hasTag("player")) {
                     entity.kill();
