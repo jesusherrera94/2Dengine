@@ -88,14 +88,16 @@ class ProjectileEmitterSystem: public System {
                     glm::vec2 projectileVelocity = projectileEmitter.projectileVelocity;
                     if (entity.hasComponent<RigidBodyComponent>()) {
                         const auto rigidBody = entity.getComponent<RigidBodyComponent>();
-                        int directionX = 0;
-                        int directionY = 0;
-                        if(rigidBody.velocity.x > 0) directionX = +1;
-                        if(rigidBody.velocity.x < 0) directionX = -1;
-                        if(rigidBody.velocity.y > 0) directionY = +1;
-                        if(rigidBody.velocity.y < 0) directionY = -1;
-                        projectileVelocity.x = projectileEmitter.projectileVelocity.x * directionX;
-                        projectileVelocity.y = projectileEmitter.projectileVelocity.y * directionY;
+                        if (rigidBody.velocity.x != 0 || rigidBody.velocity.y != 0) {
+                            int directionX = 0;
+                            int directionY = 0;
+                            if(rigidBody.velocity.x > 0) directionX = +1;
+                            if(rigidBody.velocity.x < 0) directionX = -1;
+                            if(rigidBody.velocity.y > 0) directionY = +1;
+                            if(rigidBody.velocity.y < 0) directionY = -1;
+                            projectileVelocity.x = projectileEmitter.projectileVelocity.x * directionX;
+                            projectileVelocity.y = projectileEmitter.projectileVelocity.y * directionY;
+                        }
                     }
 
                     Entity projectile = registry->createEntity();
