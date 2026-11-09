@@ -33,6 +33,7 @@
 #include "../systems/projectileLifecycleSystem.h"
 #include "../systems/renderTextSystem.h"
 #include "../systems/renderHealthBarSystem.h"
+#include "../systems/renderGUISystem.h"
 
 #include "../events/keyPressedEvent.h"
 
@@ -88,6 +89,7 @@ void Game::loadLevel(int level) {
     registry->addSystem<ProjectileLifeCycleSystem>();
     registry->addSystem<RenderTextSystem>();
     registry->addSystem<RenderHealthBarSystem>();
+    registry->addSystem<RenderGUISystem>();
 
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -344,14 +346,7 @@ void Game::render() {
    registry->getSystem<RenderSystem>().update(renderer, assetStore, camera);
    registry->getSystem<DebugColliderRectangle>().update(renderer, isDebugEnabled, camera);
    if (isDebugEnabled) {
-        ImGui_ImplSDLRenderer2_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-
-        ImGui::NewFrame();
-        ImGui::ShowDemoWindow();
-        ImGui::Render();
-        ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
-        
+       registry->getSystem<RenderGUISystem>().update(renderer, registry);
    }
    registry->getSystem<RenderTextSystem>().update(renderer, assetStore, camera);
    registry->getSystem<RenderHealthBarSystem>().update(renderer, assetStore, camera);
