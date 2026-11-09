@@ -9,7 +9,8 @@ SRC_FILES = src/*.cpp \
 			src/game/*.cpp \
 			src/logger/*.cpp \
 			src/ecs/*.cpp \
-			src/assetStore/*.cpp
+			src/assetStore/*.cpp \
+			libs/imgui/*.cpp
 LINKER_FLAGS = `sdl2-config --libs --cflags` -lSDL2_image -lSDL2_ttf -lSDL2_mixer -llua
 OBJ_NAME = gameengine
 
