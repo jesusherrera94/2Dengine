@@ -4,8 +4,8 @@
 #include <glm/glm.hpp>
 #include <fstream>
 #include <imgui/imgui.h>
-#include <imgui/imgui_sdl.h>
 #include <imgui/imgui_impl_sdl2.h>
+#include <imgui/imgui_impl_sdlrenderer2.h>
 
 #include "../ecs/ecs.h"
 #include "game.h"
@@ -232,8 +232,14 @@ void Game::initialize() {
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
     // initialize imgui context
+    IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiSDL::Initialize(renderer, windowWidth, windowHeight);
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+    ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+    ImGui_ImplSDLRenderer2_Init(renderer);
 
     camera.x = 0;
     camera.y = 0;
@@ -253,7 +259,8 @@ void Game::run() {
 }
 
 void Game::destroy() {
-    ImGuiSDL::Deinitialize();
+    ImGui_ImplSDLRenderer2_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -337,10 +344,14 @@ void Game::render() {
    registry->getSystem<RenderSystem>().update(renderer, assetStore, camera);
    registry->getSystem<DebugColliderRectangle>().update(renderer, isDebugEnabled, camera);
    if (isDebugEnabled) {
+        ImGui_ImplSDLRenderer2_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+
         ImGui::NewFrame();
         ImGui::ShowDemoWindow();
         ImGui::Render();
-        ImGuiSDL::Render(ImGui::GetDrawData());
+        ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+        
    }
    registry->getSystem<RenderTextSystem>().update(renderer, assetStore, camera);
    registry->getSystem<RenderHealthBarSystem>().update(renderer, assetStore, camera);
