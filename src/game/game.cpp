@@ -3,6 +3,9 @@
 #include <SDL2/SDL_image.h>
 #include <glm/glm.hpp>
 #include <fstream>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_sdl2.h>
+#include <imgui/imgui_impl_sdlrenderer2.h>
 
 #include "../ecs/ecs.h"
 #include "game.h"
@@ -30,6 +33,7 @@
 #include "../systems/projectileLifecycleSystem.h"
 #include "../systems/renderTextSystem.h"
 #include "../systems/renderHealthBarSystem.h"
+#include "../systems/renderGUISystem.h"
 
 #include "../events/keyPressedEvent.h"
 
@@ -85,6 +89,7 @@ void Game::loadLevel(int level) {
     registry->addSystem<ProjectileLifeCycleSystem>();
     registry->addSystem<RenderTextSystem>();
     registry->addSystem<RenderHealthBarSystem>();
+    registry->addSystem<RenderGUISystem>();
 
     // adding assets to the store
     assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
@@ -109,7 +114,7 @@ void Game::loadLevel(int level) {
     // add some components
     // registry->addComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
     // registry->addComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
-    tank.addComponent<TransformComponent>(glm::vec2(500.0, 250.0), glm::vec2(1.0, 1.0), 0.0);
+    tank.addComponent<TransformComponent>(glm::vec2(773.0, 126.0), glm::vec2(1.0, 1.0), 0.0);
     tank.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     tank.addComponent<SpriteComponent>("tank-image", 32,32, 2);
     tank.addComponent<BoxColliderComponent>(32, 32);
@@ -118,7 +123,7 @@ void Game::loadLevel(int level) {
 
     Entity truck = registry->createEntity();
     truck.group("enemies");
-    truck.addComponent<TransformComponent>(glm::vec2(390.0, 250.0), glm::vec2(1.0, 1.0), 0.0);
+    truck.addComponent<TransformComponent>(glm::vec2(460.0, 395.0), glm::vec2(1.0, 1.0), 0.0);
     truck.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     truck.addComponent<SpriteComponent>("truck-image", 32,32, 1);
     truck.addComponent<BoxColliderComponent>(32, 32);
@@ -129,7 +134,7 @@ void Game::loadLevel(int level) {
 
     Entity choppper = registry->createEntity();
     choppper.tag("player");
-    choppper.addComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
+    choppper.addComponent<TransformComponent>(glm::vec2(243.0, 115.0), glm::vec2(1.0, 1.0), 0.0);
     choppper.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     choppper.addComponent<SpriteComponent>("chopper-image", 32,32, 1);
     choppper.addComponent<AnimationComponent>(2, 15, true);
@@ -228,6 +233,16 @@ void Game::initialize() {
     // real fullscreen
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
+    // initialize imgui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+    ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+    ImGui_ImplSDLRenderer2_Init(renderer);
+
     camera.x = 0;
     camera.y = 0;
     camera.w = windowWidth;
@@ -246,6 +261,9 @@ void Game::run() {
 }
 
 void Game::destroy() {
+    ImGui_ImplSDLRenderer2_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -254,6 +272,16 @@ void Game::destroy() {
 void Game::processInput() {
     SDL_Event sdlEvent;
     while (SDL_PollEvent(&sdlEvent)) {
+        // ImGui SDL input
+        ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
+        ImGuiIO& io = ImGui::GetIO();
+        int mouseX, mouseY;
+        const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
+        io.MousePos = ImVec2(mouseX, mouseY);
+        io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
+        io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
+
+        //handling core SDL events
         switch (sdlEvent.type) {
             case SDL_QUIT: // the user clicked the close button on the window
                 isRunning = false;
@@ -263,7 +291,7 @@ void Game::processInput() {
                 if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
                     isRunning = false;
                 }
-                if (sdlEvent.key.keysym.sym == SDLK_d) {
+                if (sdlEvent.key.keysym.sym == SDLK_F1) {
                     isDebugEnabled = !isDebugEnabled;
                 }
                 // trigger a keyboard event
@@ -317,6 +345,9 @@ void Game::render() {
    // Invoke all the system that need to render
    registry->getSystem<RenderSystem>().update(renderer, assetStore, camera);
    registry->getSystem<DebugColliderRectangle>().update(renderer, isDebugEnabled, camera);
+   if (isDebugEnabled) {
+       registry->getSystem<RenderGUISystem>().update(renderer, registry, camera);
+   }
    registry->getSystem<RenderTextSystem>().update(renderer, assetStore, camera);
    registry->getSystem<RenderHealthBarSystem>().update(renderer, assetStore, camera);
 
