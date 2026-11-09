@@ -51,7 +51,7 @@ class RenderSystem: public System {
                     &destRect,
                     transform.rotation,
                     NULL,
-                    SDL_FLIP_NONE
+                    sprite.flip
                 );
             };
         }

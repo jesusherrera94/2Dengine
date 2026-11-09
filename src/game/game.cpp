@@ -98,6 +98,7 @@ void Game::loadLevel(int level) {
     assetStore->addTexture(renderer, "radar-image", "./assets/images/radar.png");
     assetStore->addTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
     assetStore->addTexture(renderer, "bullet-image", "./assets/images/bullet.png");
+    assetStore->addTexture(renderer, "tree-image", "./assets/images/tree.png");
     assetStore->addFont("charriot-font", "./assets/fonts/charriot.ttf", 28);
     assetStore->addFont("pico8-font-5", "./assets/fonts/pico8.ttf", 5);
     assetStore->addFont("pico8-font-10", "./assets/fonts/pico8.ttf", 10);
@@ -115,10 +116,10 @@ void Game::loadLevel(int level) {
     // registry->addComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
     // registry->addComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
     tank.addComponent<TransformComponent>(glm::vec2(773.0, 126.0), glm::vec2(1.0, 1.0), 0.0);
-    tank.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
+    tank.addComponent<RigidBodyComponent>(glm::vec2(20.0, 0.0));
     tank.addComponent<SpriteComponent>("tank-image", 32,32, 2);
     tank.addComponent<BoxColliderComponent>(32, 32);
-    tank.addComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 3000, 10, false);
+    tank.addComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 1000, 5000, 10, false);
     tank.addComponent<HealthComponent>(100);
 
     Entity truck = registry->createEntity();
@@ -164,6 +165,20 @@ void Game::loadLevel(int level) {
     Entity title = registry->createEntity();
     SDL_Color greenColor = {0,255,0};
     title.addComponent<TextLabelComponent>(glm::vec2((windowWidth / 2) - 120, 45), "Chopper Game 1.0", "charriot-font", greenColor, true);
+
+    Entity treeA = registry->createEntity();
+    treeA.group("obstacles");
+    treeA.addComponent<TransformComponent>(glm::vec2(873.0, 131.0), glm::vec2(1.0, 1.0), 0.0);
+    treeA.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
+    treeA.addComponent<SpriteComponent>("tree-image", 16,32, 2);
+    treeA.addComponent<BoxColliderComponent>(16, 32);
+
+    Entity treeB = registry->createEntity();
+    treeB.group("obstacles");
+    treeB.addComponent<TransformComponent>(glm::vec2(673.0, 131.0), glm::vec2(1.0, 1.0), 0.0);
+    treeB.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
+    treeB.addComponent<SpriteComponent>("tree-image", 16,32, 2);
+    treeB.addComponent<BoxColliderComponent>(16, 32);
 
 }
 
@@ -321,6 +336,7 @@ void Game::update() {
     eventBus->reset();
 
     // Perform the subscription of the events for all systems
+    registry->getSystem<MovementSystem>().SubscribeToEvents(eventBus);
     registry->getSystem<DamageSystem>().SubscribeToEvents(eventBus);
     registry->getSystem<KeyboardMovementSystem>().subscribeToEvents(eventBus);
     registry->getSystem<ProjectileEmitterSystem>().subscribeToEvents(eventBus);

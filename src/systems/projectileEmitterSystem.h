@@ -84,10 +84,24 @@ class ProjectileEmitterSystem: public System {
                         projectilePosition.x += (transform.scale.x * sprite.width / 2);
                         projectilePosition.y += (transform.scale.y * sprite.height / 2);
                     }
+
+                    glm::vec2 projectileVelocity = projectileEmitter.projectileVelocity;
+                    if (entity.hasComponent<RigidBodyComponent>()) {
+                        const auto rigidBody = entity.getComponent<RigidBodyComponent>();
+                        int directionX = 0;
+                        int directionY = 0;
+                        if(rigidBody.velocity.x > 0) directionX = +1;
+                        if(rigidBody.velocity.x < 0) directionX = -1;
+                        if(rigidBody.velocity.y > 0) directionY = +1;
+                        if(rigidBody.velocity.y < 0) directionY = -1;
+                        projectileVelocity.x = projectileEmitter.projectileVelocity.x * directionX;
+                        projectileVelocity.y = projectileEmitter.projectileVelocity.y * directionY;
+                    }
+
                     Entity projectile = registry->createEntity();
                     projectile.group("projectiles");
                     projectile.addComponent<TransformComponent>(projectilePosition, glm::vec2(1.0, 1.0), 0.0);
-                    projectile.addComponent<RigidBodyComponent>(projectileEmitter.projectileVelocity);
+                    projectile.addComponent<RigidBodyComponent>(projectileVelocity);
                     projectile.addComponent<SpriteComponent>("bullet-image", 4, 4, 4);
                     projectile.addComponent<BoxColliderComponent>(4, 4);
                     projectile.addComponent<ProjectileComponent>(
