@@ -291,7 +291,7 @@ void Game::processInput() {
                 if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
                     isRunning = false;
                 }
-                if (sdlEvent.key.keysym.sym == SDLK_d) {
+                if (sdlEvent.key.keysym.sym == SDLK_F1) {
                     isDebugEnabled = !isDebugEnabled;
                 }
                 // trigger a keyboard event
@@ -346,7 +346,7 @@ void Game::render() {
    registry->getSystem<RenderSystem>().update(renderer, assetStore, camera);
    registry->getSystem<DebugColliderRectangle>().update(renderer, isDebugEnabled, camera);
    if (isDebugEnabled) {
-       registry->getSystem<RenderGUISystem>().update(renderer, registry);
+       registry->getSystem<RenderGUISystem>().update(renderer, registry, camera);
    }
    registry->getSystem<RenderTextSystem>().update(renderer, assetStore, camera);
    registry->getSystem<RenderHealthBarSystem>().update(renderer, assetStore, camera);
