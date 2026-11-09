@@ -114,7 +114,7 @@ void Game::loadLevel(int level) {
     // add some components
     // registry->addComponent<TransformComponent>(tank, glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
     // registry->addComponent<RigidBodyComponent>(tank, glm::vec2(50.0, 0.0));
-    tank.addComponent<TransformComponent>(glm::vec2(500.0, 250.0), glm::vec2(1.0, 1.0), 0.0);
+    tank.addComponent<TransformComponent>(glm::vec2(773.0, 126.0), glm::vec2(1.0, 1.0), 0.0);
     tank.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     tank.addComponent<SpriteComponent>("tank-image", 32,32, 2);
     tank.addComponent<BoxColliderComponent>(32, 32);
@@ -123,7 +123,7 @@ void Game::loadLevel(int level) {
 
     Entity truck = registry->createEntity();
     truck.group("enemies");
-    truck.addComponent<TransformComponent>(glm::vec2(390.0, 250.0), glm::vec2(1.0, 1.0), 0.0);
+    truck.addComponent<TransformComponent>(glm::vec2(460.0, 395.0), glm::vec2(1.0, 1.0), 0.0);
     truck.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     truck.addComponent<SpriteComponent>("truck-image", 32,32, 1);
     truck.addComponent<BoxColliderComponent>(32, 32);
@@ -134,7 +134,7 @@ void Game::loadLevel(int level) {
 
     Entity choppper = registry->createEntity();
     choppper.tag("player");
-    choppper.addComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
+    choppper.addComponent<TransformComponent>(glm::vec2(243.0, 115.0), glm::vec2(1.0, 1.0), 0.0);
     choppper.addComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     choppper.addComponent<SpriteComponent>("chopper-image", 32,32, 1);
     choppper.addComponent<AnimationComponent>(2, 15, true);
