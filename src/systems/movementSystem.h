@@ -10,6 +10,7 @@
 
 class MovementSystem: public System {
     private:
+        int safeMargin = 100;
         void onEnemyHitsObstacle(Entity a, Entity b) {
             if (a.hasComponent<RigidBodyComponent>() && a.hasComponent<SpriteComponent>()) {
                 auto& rigidBody = a.getComponent<RigidBodyComponent>();
@@ -60,9 +61,9 @@ class MovementSystem: public System {
                 transform.position.y += rigidBodyComponent.velocity.y * deltaTime;
                 bool isEntityOutsideMap = (
                     transform.position.x < 0 ||
-                    transform.position.x > Game::mapWidth ||
+                    transform.position.x > Game::mapWidth + safeMargin ||
                     transform.position.y < 0 ||
-                    transform.position.y > Game::mapHeight
+                    transform.position.y > Game::mapHeight + safeMargin
                     );
                 if (isEntityOutsideMap && entity.hasTag("player")) {
                     rigidBodyComponent.velocity.x = 0;
