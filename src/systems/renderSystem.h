@@ -21,6 +21,24 @@ class RenderSystem: public System {
 
             // sort all the entities of our system by z-index
             std::vector<Entity> entities = getSystemEntities();
+
+            // remove all the entities that are outside the camera view
+            entities.erase(
+                std::remove_if(entities.begin(), entities.end(), [&camera](Entity& entity) {
+                    const auto transformComponent = entity.getComponent<TransformComponent>();
+                    const auto spriteComponent = entity.getComponent<SpriteComponent>();
+
+                    bool isEntityOutsideCameraView = (
+                        transformComponent.position.x + ( transformComponent.scale.x * spriteComponent.width) < camera.x ||
+                        transformComponent.position.x  > camera.x  + camera.w ||
+                        transformComponent.position.y + ( transformComponent.scale.y * spriteComponent.height) < camera.y ||
+                        transformComponent.position.y  > camera.y  + camera.h
+                    );
+                    return isEntityOutsideCameraView && !spriteComponent.isFixed;
+                }),
+                entities.end()
+            );
+
             std::sort(entities.begin(), entities.end(), [](Entity& a, Entity& b) {
                 auto spriteA = a.getComponent<SpriteComponent>();
                 auto spriteB = b.getComponent<SpriteComponent>();
