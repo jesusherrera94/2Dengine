@@ -1,6 +1,7 @@
 #include "levelLoader.h"
 #include <fstream>
 #include <sol/sol.hpp>
+#include <string>
 
 #include "../ecs/ecs.h"
 #include "game.h"
@@ -17,13 +18,15 @@
 
 #include "../logger/logger.h"
 
-void LevelLoader::loadMap(const std::unique_ptr<Registry>& registry) {
-    int tileSize = 32;
-    double tileScale = 2.0;
-    int mapNumCols = 29;
-    int mapNumRows = 30;
+void LevelLoader::loadMap(const std::unique_ptr<Registry>& registry, sol::table map) {
+    std::string mapFilePath = map["map_file"];
+    std::string mapTextureAssetId = map["texture_asset_id"];
+    int tileSize = map["tile_size"];
+    double tileScale = map["scale"];;
+    int mapNumCols = map["num_cols"];
+    int mapNumRows = map["num_rows"];
     std::fstream mapFile;
-    mapFile.open("./assets/tilemaps/jungle.map");
+    mapFile.open(mapFilePath);
 
     for (int y=0; y< mapNumRows; y++) {
         for (int x=0; x<mapNumCols; x++) {
@@ -55,32 +58,54 @@ LevelLoader::~LevelLoader(){
     Logger::Log("LevelLoader destructor called");
 }
 
-void LevelLoader::loadLevel(const std::unique_ptr<Registry>& registry,
+void LevelLoader::loadLevel(
+            sol::state& lua, 
+            const std::unique_ptr<Registry>& registry,
             const std::unique_ptr<AssetStore>& assetStore, 
             SDL_Renderer* renderer, 
-            int level){
+            int levelNumber){
+    
+    sol::load_result script = lua.load_file("./assets/scripts/level" + std::to_string(levelNumber) + ".lua");
+    // this checks the syntax of our script, but it does not execute the script
+    if (!script.valid()) {
+        sol::error err = script;
+        std::string errorMessage = err.what();
+        Logger::Err("Error loading the lua script: "+errorMessage);
+        return;
+    }
 
-    sol::state lua;
-    lua.open_libraries(sol::lib::base);
+    lua.script_file("./assets/scripts/level" + std::to_string(levelNumber) + ".lua");
+    
+    sol::table level = lua["Level"];
 
-    // adding assets to the store
-    // assetStore->addTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
-    // assetStore->addTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
-    // assetStore->addTexture(renderer, "chopper-image", "./assets/images/chopper-spritesheet.png");
-    // assetStore->addTexture(renderer, "radar-image", "./assets/images/radar.png");
-    // assetStore->addTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
-    // assetStore->addTexture(renderer, "bullet-image", "./assets/images/bullet.png");
-    // assetStore->addTexture(renderer, "tree-image", "./assets/images/tree.png");
-    // assetStore->addFont("charriot-font", "./assets/fonts/charriot.ttf", 28);
-    // assetStore->addFont("pico8-font-5", "./assets/fonts/pico8.ttf", 5);
-    // assetStore->addFont("pico8-font-10", "./assets/fonts/pico8.ttf", 10);
+    // read the level assets
+    sol::table assets = level["assets"];
+
+    int i = 0;
+    while (true) {
+        sol::optional<sol::table> hasAsset = assets[i];
+        if (hasAsset == sol::nullopt) {
+            break;
+        }
+        sol::table asset = asset[i];
+        std::string assetType = asset["type"];
+        std::string assetId = asset["id"];
+        if (assetType == "texture") {
+            assetStore->addTexture(renderer, assetId, asset["file"]);
+        } 
+        if (assetType == "font") {
+            assetStore->addFont(assetId, asset["file"], asset["font_size"]);
+        }
+        i++;
+    }
 
 
-    // // load the tile map
-    // loadMap(registry);
+    // load the tile map
+    sol::table map = level["tilemap"];
+    loadMap(registry, map);
 
 
-    // // Create some entity
+    // Load the entities
     // Entity tank = registry->createEntity();
     // tank.group("enemies");
     

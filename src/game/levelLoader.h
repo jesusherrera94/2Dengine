@@ -3,18 +3,20 @@
 
 #include <SDL2/SDL.h>
 #include <memory>
+#include <sol/sol.hpp>
 
 #include "../ecs/ecs.h"
 #include "../assetStore/assetStore.h"
 
 class LevelLoader {
     private:
-        void loadMap(const std::unique_ptr<Registry>& registry);
+        void loadMap(const std::unique_ptr<Registry>& registry, sol::table map);
     public: 
         LevelLoader();
         ~LevelLoader();
 
         void loadLevel(
+            sol::state& lua,
             const std::unique_ptr<Registry>& registry,
             const std::unique_ptr<AssetStore>& assetStore, 
             SDL_Renderer* renderer, 
