@@ -22,8 +22,6 @@ class Game {
     std::unique_ptr<AssetStore> assetStore;
     std::unique_ptr<EventBus> eventBus;
 
-    void loadMap();
-
     public:
         static int windowWidth;
         static int windowHeight;
@@ -40,7 +38,6 @@ class Game {
         void processInput();
         void update();
         void render();
-        void loadLevel(int level);
         
 };
 
