@@ -10,7 +10,8 @@
 
 class LevelLoader {
     private:
-        void loadMap(const std::unique_ptr<Registry>& registry, sol::table map);
+        void loadMap(const std::unique_ptr<Registry>& registry, sol::table& map);
+        void loadEntities(const std::unique_ptr<Registry>& registry, const sol::table& entities);
     public: 
         LevelLoader();
         ~LevelLoader();
