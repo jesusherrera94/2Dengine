@@ -22,5 +22,9 @@ function factorial(n)
     for i = 2, n do
         result = result * i
     end
+    print(result)
     return result
 end
+
+-- calling a function from c++
+print("The cube of the number 3 is equal to "..cube(3));
