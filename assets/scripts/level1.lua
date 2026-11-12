@@ -2791,7 +2791,6 @@ Level = {
                     hit_percentage_damage = 10,
                     friendly = false
                 },
-                --[[
                 on_update_script = {
                     [0] =
                     function(entity, delta_time, ellapsed_time)
@@ -2809,13 +2808,13 @@ Level = {
                         -- set the transform rotation to match going up or down
                         if (current_velocity_y < 0) then
                             set_rotation(entity, 0) -- point up
-                            set_projectile_velocity(entity, 0, -200) -- shoot projectiles up
+                            set_projectile_velocity(entity, 0, 200) -- shoot projectiles up
                         else
                             set_rotation(entity, 180) -- point down
                             set_projectile_velocity(entity, 0, 200) -- shoot projectiles down
                         end
                     end
-                }--]]
+                }
             }
         },
         {

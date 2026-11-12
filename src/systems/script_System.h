@@ -52,6 +52,44 @@ void setEntityPosition(Entity entity, double x, double y) {
     }
 }
 
+void setEntityVelocity(Entity entity, double x, double y) {
+    if (entity.hasComponent<RigidBodyComponent>()) {
+        auto& rigidBody = entity.getComponent<RigidBodyComponent>();
+        rigidBody.velocity.x = x;
+        rigidBody.velocity.y = y;
+    } else {
+        Logger::Err("Trying to set the position of an entity that has no RigidBodyComponent");
+    }
+}
+
+void setEntityRotation(Entity entity, double angle) {
+    if (entity.hasComponent<TransformComponent>()) {
+        auto& transform = entity.getComponent<TransformComponent>();
+        transform.rotation = angle;
+    } else {
+        Logger::Err("Trying to set the position of an entity that has no TransformComponent");
+    }
+}
+
+void setEntityAnimationFrame(Entity entity, int frame) {
+    if (entity.hasComponent<AnimationComponent>()) {
+        auto& animation = entity.getComponent<AnimationComponent>();
+        animation.currentFrame = frame;
+    } else {
+        Logger::Err("Trying to set the position of an entity that has no AnimationComponent");
+    }
+}
+
+void setProjectileVelocity(Entity entity, double x, double y) {
+    if (entity.hasComponent<ProjectileEmitterComponent>()) {
+        auto& projectileEmitter = entity.getComponent<ProjectileEmitterComponent>();
+        projectileEmitter.projectileVelocity.x = x;
+        projectileEmitter.projectileVelocity.y = y;
+    } else {
+        Logger::Err("Trying to set the position of an entity that has no ProjectileEmitterComponent");
+    }
+}
+
 class ScriptSystem: public System {
     public:
         ScriptSystem() {
@@ -70,11 +108,11 @@ class ScriptSystem: public System {
             // create the binding function
             lua.set_function("set_position", setEntityPosition);
             lua.set_function("get_position", getEntityPosition);
-            lua.set_function("set_velocity", setEntityvelocity);
+            lua.set_function("set_velocity", setEntityVelocity);
             lua.set_function("get_velocity", getEntityVelocity);
             lua.set_function("set_rotation", setEntityRotation);
             lua.set_function("set_projectile_velocity", setProjectileVelocity);
-            lua.set_function("set_animation_frame", setAnimationFrame);
+            lua.set_function("set_animation_frame", setEntityAnimationFrame);
         }
 
         void update(double deltaTime, int ellapsedTime) {
