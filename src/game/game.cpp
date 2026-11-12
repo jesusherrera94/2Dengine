@@ -23,7 +23,7 @@
 #include "../systems/renderTextSystem.h"
 #include "../systems/renderHealthBarSystem.h"
 #include "../systems/renderGUISystem.h"
-#include "../systems/scriptSystem.h"
+#include "../systems/script_System.h"
 
 #include "../events/keyPressedEvent.h"
 #include "levelLoader.h"
@@ -55,6 +55,9 @@ void Game::setup() {
     registry->addSystem<RenderHealthBarSystem>();
     registry->addSystem<RenderGUISystem>();
     registry->addSystem<ScriptSystem>();
+
+    // create the binding between c++ and Lua
+    registry->getSystem<ScriptSystem>().createLuaBinding(lua);
 
     LevelLoader loader;
     lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
@@ -225,7 +228,7 @@ void Game::update() {
    registry->getSystem<ProjectileEmitterSystem>().update(registry);
    registry->getSystem<CameraMovementSystem>().update(camera);
    registry->getSystem<ProjectileLifeCycleSystem>().update();
-   registry->getSystem<ScriptSystem>().update();
+   registry->getSystem<ScriptSystem>().update(deltaTime, SDL_GetTicks());
 }
 
 void Game::render() {
