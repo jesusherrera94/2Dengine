@@ -23,6 +23,7 @@
 #include "../systems/renderTextSystem.h"
 #include "../systems/renderHealthBarSystem.h"
 #include "../systems/renderGUISystem.h"
+#include "../systems/scriptSystem.h"
 
 #include "../events/keyPressedEvent.h"
 #include "levelLoader.h"
@@ -53,6 +54,7 @@ void Game::setup() {
     registry->addSystem<RenderTextSystem>();
     registry->addSystem<RenderHealthBarSystem>();
     registry->addSystem<RenderGUISystem>();
+    registry->addSystem<ScriptSystem>();
 
     LevelLoader loader;
     lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
@@ -223,6 +225,7 @@ void Game::update() {
    registry->getSystem<ProjectileEmitterSystem>().update(registry);
    registry->getSystem<CameraMovementSystem>().update(camera);
    registry->getSystem<ProjectileLifeCycleSystem>().update();
+   registry->getSystem<ScriptSystem>().update();
 }
 
 void Game::render() {

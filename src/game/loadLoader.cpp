@@ -15,6 +15,7 @@
 #include "../components/projectileEmitterComponent.h"
 #include "../components/healthComponent.h"
 #include "../components/textLabelComponent.h"
+#include "../components/scriptComponent.h"
 
 #include "../logger/logger.h"
 
@@ -184,6 +185,14 @@ void LevelLoader::loadEntities(const std::unique_ptr<Registry>& registry, const 
                     )
                 );
             }
+
+            // script component
+            sol::optional<sol::table> script = entity["components"]["on_update_script"];
+            if (script != sol::nullopt) {
+                sol::function func = entity["components"]["on_update_script"][0];
+                newEntity.addComponent<ScriptComponent>(func);
+            }
+
         
         i++;
     }
