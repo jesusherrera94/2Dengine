@@ -7,18 +7,40 @@
 */
 
 #include <sol/sol.hpp>
+#include <tuple>
 
 #include "../ecs/ecs.h"
 #include "../components/scriptComponent.h"
 #include "../components/transformComponent.h"
+#include "../components/rigidBodyComponent.h"
+#include "../components/animationComponent.h"
+#include "../components/projectileEmitterComponent.h"
 
 #include "../logger/logger.h"
 
 
 // declare some native c++ functions that we will bind with Lua Function
-// int getEntityPosition(Entity entity) {
+std::tuple<double, double> getEntityPosition(Entity entity) {
+    if (entity.hasComponent<TransformComponent>()) {
+        const auto transform = entity.getComponent<TransformComponent>();
+        return std::make_tuple(transform.position.x, transform.position.y);
+    } else {
+        Logger::Err("Trying to set the position of an entity that has no TransformComponent");
+        return std::make_tuple(0.0,0.0);
+    }
 
-// }
+}
+
+std::tuple<double, double> getEntityVelocity(Entity entity) {
+    if (entity.hasComponent<RigidBodyComponent>()) {
+        const auto rigidBody = entity.getComponent<RigidBodyComponent>();
+        return std::make_tuple(rigidBody.velocity.x, rigidBody.velocity.y);
+    } else {
+        Logger::Err("Trying to set the position of an entity that has no RigidBodyComponent");
+        return std::make_tuple(0.0,0.0);
+    }
+
+}
 
 void setEntityPosition(Entity entity, double x, double y) {
     if (entity.hasComponent<TransformComponent>()) {
@@ -47,6 +69,12 @@ class ScriptSystem: public System {
             );
             // create the binding function
             lua.set_function("set_position", setEntityPosition);
+            lua.set_function("get_position", getEntityPosition);
+            lua.set_function("set_velocity", setEntityvelocity);
+            lua.set_function("get_velocity", getEntityVelocity);
+            lua.set_function("set_rotation", setEntityRotation);
+            lua.set_function("set_projectile_velocity", setProjectileVelocity);
+            lua.set_function("set_animation_frame", setAnimationFrame);
         }
 
         void update(double deltaTime, int ellapsedTime) {
