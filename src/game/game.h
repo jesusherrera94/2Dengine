@@ -5,6 +5,7 @@
 #include "../ecs/ecs.h"
 #include "../assetStore/assetStore.h"
 #include "../eventBus/eventBus.h"
+#include <sol/sol.hpp>
 
 const int FPS = 60;
 const int MILLISECONDS_PER_FRAME = 1000 / FPS;
@@ -17,12 +18,11 @@ class Game {
     Uint32 millisecondsPreviousFrame = 0;
     bool isDebugEnabled = false;
     SDL_Rect camera;
+    sol::state lua;
 
     std::unique_ptr<Registry> registry;
     std::unique_ptr<AssetStore> assetStore;
     std::unique_ptr<EventBus> eventBus;
-
-    void loadMap();
 
     public:
         static int windowWidth;
@@ -40,7 +40,6 @@ class Game {
         void processInput();
         void update();
         void render();
-        void loadLevel(int level);
         
 };
 
