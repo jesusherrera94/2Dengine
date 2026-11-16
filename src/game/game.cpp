@@ -195,7 +195,14 @@ void Game::processInput() {
 }
 
 void Game::update() {
-    // TODO: If the update is running too fast
+
+    // get the initial time for calculating the fps
+    const Uint32 now = SDL_GetTicks();
+    if (fpsIntervalStart == 0) {
+        fpsIntervalStart = now;
+    }
+
+    // If the update is running too fast
     // waste thime until we reach the MILLISECONDS_PER_FRAME
     Uint32 timeToWait = MILLISECONDS_PER_FRAME - (SDL_GetTicks() - millisecondsPreviousFrame);
     if (timeToWait > 0  && timeToWait <= MILLISECONDS_PER_FRAME) {
@@ -229,6 +236,13 @@ void Game::update() {
    registry->getSystem<CameraMovementSystem>().update(camera);
    registry->getSystem<ProjectileLifeCycleSystem>().update();
    registry->getSystem<ScriptSystem>().update(deltaTime, SDL_GetTicks());
+
+   ++framesThisInterval;
+    if (now - fpsIntervalStart >= 1000) {
+        fps = static_cast<float>(framesThisInterval);
+        framesThisInterval = 0;
+        fpsIntervalStart = now;
+    }
 }
 
 void Game::render() {
@@ -239,7 +253,7 @@ void Game::render() {
    registry->getSystem<RenderSystem>().update(renderer, assetStore, camera);
    registry->getSystem<DebugColliderRectangle>().update(renderer, isDebugEnabled, camera);
    if (isDebugEnabled) {
-       registry->getSystem<RenderGUISystem>().update(renderer, registry, camera);
+       registry->getSystem<RenderGUISystem>().update(renderer, registry, camera, fps);
    }
    registry->getSystem<RenderTextSystem>().update(renderer, assetStore, camera);
    registry->getSystem<RenderHealthBarSystem>().update(renderer, assetStore, camera);

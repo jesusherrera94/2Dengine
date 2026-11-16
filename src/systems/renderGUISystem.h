@@ -21,7 +21,11 @@
 class RenderGUISystem: public System {
     public:
         RenderGUISystem() = default;
-        void update(SDL_Renderer* renderer, const std::unique_ptr<Registry>& registry, const SDL_Rect& camera) {
+        void update(
+            SDL_Renderer* renderer,
+            const std::unique_ptr<Registry>& registry,
+            const SDL_Rect& camera,
+            float& fps) {
             ImGui_ImplSDLRenderer2_NewFrame();
             ImGui_ImplSDL2_NewFrame();
             ImGui::NewFrame();
@@ -106,7 +110,15 @@ class RenderGUISystem: public System {
             ImGui::End();
 
             ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoNav;
+
             ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always, ImVec2(0,0));
+            ImGui::SetNextWindowBgAlpha(0.9f);
+            if (ImGui::Begin("Performance", NULL, windowFlags)) {
+                ImGui::Text("frame: %.1f fps", fps);
+            }
+            ImGui::End();
+
+            ImGui::SetNextWindowPos(ImVec2(10, 50), ImGuiCond_Always, ImVec2(0,0));
             ImGui::SetNextWindowBgAlpha(0.9f);
             if (ImGui::Begin("Map Coordinates", NULL, windowFlags)) {
                 ImGui::Text(
@@ -116,6 +128,7 @@ class RenderGUISystem: public System {
                 );
             }
             ImGui::End();
+
             ImGui::Render();
             ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
         }
