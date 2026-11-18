@@ -20,6 +20,10 @@ class Game {
     SDL_Rect camera;
     sol::state lua;
 
+    Uint32 fpsIntervalStart = 0;
+    unsigned framesThisInterval = 0;
+    float fps = 0.0f;
+
     std::unique_ptr<Registry> registry;
     std::unique_ptr<AssetStore> assetStore;
     std::unique_ptr<EventBus> eventBus;
